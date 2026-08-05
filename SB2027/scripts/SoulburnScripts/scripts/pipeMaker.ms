@@ -65,7 +65,7 @@ global pMAFloater
 -- Includes
 
 include "$userScripts\SoulburnScripts\lib\sLib.ms"
-include "$scripts\\SoulburnScripts\\scripts\\objectAttacher.ms"
+include "$userScripts\SoulburnScripts\scripts\objectAttacher.ms"
 
 -- Variables
 

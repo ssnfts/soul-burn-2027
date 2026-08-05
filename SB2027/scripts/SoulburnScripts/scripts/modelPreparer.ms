@@ -66,12 +66,12 @@ global mPREFloater
 -- Includes
 
 include "$userScripts\SoulburnScripts\lib\sLib.ms"
-include "$scripts\\SoulburnScripts\\scripts\\iDSetter.ms"
-include "$scripts\\SoulburnScripts\\scripts\\xFormResetter.ms"
-include "$scripts\\SoulburnScripts\\scripts\\groupWithPoint.ms"
-include "$scripts\\SoulburnScripts\\scripts\\curvatureMaker.ms"
-include "$scripts\\SoulburnScripts\\scripts\\blendedCubeProjectionMaker.ms"
-include "$scripts\\SoulburnScripts\\scripts\\cameraMapTemplateRenderer.ms"
+include "$userScripts\SoulburnScripts\scripts\iDSetter.ms"
+include "$userScripts\SoulburnScripts\scripts\xFormResetter.ms"
+include "$userScripts\SoulburnScripts\scripts\groupWithPoint.ms"
+include "$userScripts\SoulburnScripts\scripts\curvatureMaker.ms"
+include "$userScripts\SoulburnScripts\scripts\blendedCubeProjectionMaker.ms"
+include "$userScripts\SoulburnScripts\scripts\cameraMapTemplateRenderer.ms"
 
 -- Variables
 
