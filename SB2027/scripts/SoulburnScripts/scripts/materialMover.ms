@@ -489,7 +489,9 @@ fn mMODefineUI =
 		dropdownlist mMOFromRangeDropdown "" items:#("Full Range", "Specific Range") selection:mMOFromRangeValue width:110 align:#right
 		spinner mMOFromRangeStartSpinner "Start: " range:[1,9999999,mMOFromRangeStartValue] type:#integer fieldWidth:40 align:#right
 		spinner mMOFromRangeEndSpinner "End: " range:[1,9999999,mMOFromRangeEndValue] type:#integer fieldWidth:40 align:#right
-		dropdownlist mMOPresetsDropdown "" items:#("Standard", "Raytrace", "Brazil 1", "Brazil 2", "mr A&D", "VrayMtl") selection:mMOPresetsValue
+		-- v2.00: labels must match the preset index mapping in materialMover()
+		-- 1 = Standard, 2 = Physical, 3 = VRay, 4 = Arnold, 5 = Corona, 6 = glTF
+		dropdownlist mMOPresetsDropdown "" items:#("Standard", "Physical", "VRayMtl", "Arnold Standard Surface", "CoronaMtl", "glTF") selection:mMOPresetsValue
 		)
 		on mMOFromTypeDropdown selected i do 
 			(

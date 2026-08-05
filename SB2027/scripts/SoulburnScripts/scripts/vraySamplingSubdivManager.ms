@@ -1,10 +1,10 @@
 ﻿-------------------------------------------------------------------------------
 -- vraySamplingSubdivManager.ms
 -- By Neil Blevins (info@neilblevins.com)
--- v 1.02
+-- v 2.00
 -- Created On: 05/28/14
 -- Modified On: 05/10/15
--- tested using Max 2014
+-- tested using Max 2027 + V-Ray 6/7
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -66,69 +66,78 @@ vSSMPosValue = sLibGetSafeUIPos 166 137
 
 -- Functions
 
-fn vraySamplingSubdivManager vSSMType vSSMSubdiv = 
+-- v2.00: V-Ray 6/7 drive sampling from the unified/adaptive sampler, and the
+-- per-material "local subdivs" are hidden unless that mode is enabled. The
+-- properties may therefore be absent or read-only depending on version and
+-- DMC settings, so every write is guarded with isProperty + try/catch and the
+-- applied/skipped counts are reported instead of the script throwing.
+
+global vSSMApplied = 0
+global vSSMSkipped = 0
+
+fn vSSMSetProp obj propName val =
 	(
+	if not (isProperty obj propName) then (vSSMSkipped += 1; return false)
+	local ok = true
+	try (setProperty obj propName val)
+	catch (ok = false)
+	if ok then vSSMApplied += 1 else vSSMSkipped += 1
+	return ok
+	)
+
+fn vSSMDoMaterial i vSSMSubdiv =
+	(
+	if classof i == VRayMtl then
+		(
+		vSSMSetProp i #reflection_subdivs vSSMSubdiv
+		vSSMSetProp i #refraction_subdivs vSSMSubdiv
+		)
+	)
+
+fn vSSMDoLight i vSSMSubdiv =
+	(
+	if classof i == VRayLight then vSSMSetProp i #subdivs vSSMSubdiv
+	)
+
+fn vraySamplingSubdivManager vSSMType vSSMSubdiv =
+	(
+	vSSMApplied = 0
+	vSSMSkipped = 0
 	undo "vraySamplingSubdivManager" on
 		(
 		if vSSMType == 1 then
 			(
 			nodes = sLibGetAllSceneMaterials()
-			for i in nodes do
-				(
-				if classof i == VRayMtl then
-					(
-					i.reflection_subdivs = vSSMSubdiv
-					i.refraction_subdivs = vSSMSubdiv
-					)
-				)
+			for i in nodes do vSSMDoMaterial i vSSMSubdiv
 			)
 		else if vSSMType == 2 then
 			(
 			nodes = sLibGetAllMaterialsOnSelectedObjects()
-			for i in nodes do
-				(
-				if classof i == VRayMtl then
-					(
-					i.reflection_subdivs = vSSMSubdiv
-					i.refraction_subdivs = vSSMSubdiv
-					)
-				)
+			for i in nodes do vSSMDoMaterial i vSSMSubdiv
 			)
 		else if vSSMType == 3 then
 			(
 			nodes = for i in lights collect i
-			for i in nodes do
-				(
-				if classof i == VRayLight then i.subdivs = vSSMSubdiv
-				)
+			for i in nodes do vSSMDoLight i vSSMSubdiv
 			)
 		else if vSSMType == 4 then
 			(
 			nodes = #()
 			for i in selection do (if superclassof i == light then append nodes i)
-			for i in nodes do
-				(
-				if classof i == VRayLight then i.subdivs = vSSMSubdiv
-				)
+			for i in nodes do vSSMDoLight i vSSMSubdiv
 			)
 		else if vSSMType == 5 then
 			(
 			nodes = sLibGetAllSceneMaterials()
-			for i in nodes do
-				(
-				if classof i == VRayMtl then
-					(
-					i.reflection_subdivs = vSSMSubdiv
-					i.refraction_subdivs = vSSMSubdiv
-					)
-				)
+			for i in nodes do vSSMDoMaterial i vSSMSubdiv
 			nodes = for i in lights collect i
-			for i in nodes do
-				(
-				if classof i == VRayLight then i.subdivs = vSSMSubdiv
-				)
+			for i in nodes do vSSMDoLight i vSSMSubdiv
 			)
 		)
+	if vSSMApplied == 0 and vSSMSkipped > 0 then
+		MessageBox ("No subdiv properties could be set (" + (vSSMSkipped as string) + " skipped).\n\nV-Ray 6/7 hide per-material local subdivs unless the DMC sampler is set to use them. Enable local subdivs in Render Setup, or control sampling from the unified sampler instead.") title:"vraySamplingSubdivManager"
+	else
+		print ("[vraySamplingSubdivManager] applied " + (vSSMApplied as string) + ", skipped " + (vSSMSkipped as string))
 	)
 	
 fn vraySamplingSubdivManagerDefaults = 
@@ -147,7 +156,7 @@ fn vSSMCloseOpenUI pos =
 	(
 	if vSSMFloater != undefined then CloseRolloutFloater vSSMFloater
 	vSSMDefineUI()
-	vSSMFloater = newRolloutFloater "vraySamplingSubdivManager v1.02" 166 137 pos.x pos.y
+	vSSMFloater = newRolloutFloater "vraySamplingSubdivManager v2.00" 166 137 pos.x pos.y
 	addRollout vSSMRollout vSSMFloater
 	)
 

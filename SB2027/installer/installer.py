@@ -80,9 +80,11 @@ INSTALL_MAP = [
     ("scripts/Startup/SoulburnScripts_ToolbarAutoCreate.ms","scripts/startup/SoulburnScripts_ToolbarAutoCreate.ms"),
     ("MacroScripts/SoulburnScripts.mcr",                 "usermacros/SoulburnScripts.mcr"),
     ("MacroScripts/SoulburnScriptsExtras.mcr",           "usermacros/SoulburnScriptsExtras.mcr"),
-    # CUIX toolbar definition -- goes to en-US/plugcfg/SoulburnScripts/
+    # CUIX toolbar definition -- primary: en-US/plugcfg/SoulburnScripts/ (where #plugcfg resolves on Max 2027)
     # This is the same location ChaosScatter and other plugins use.
     ("MacroScripts/SoulburnScripts.cuix",                "en-US/plugcfg/SoulburnScripts/SoulburnScripts.cuix"),
+    # CUIX toolbar definition -- secondary: UI_ln/ (used by cui.loadConfig fallback in startup script)
+    ("MacroScripts/SoulburnScripts.cuix",                "UI_ln/SoulburnScripts.cuix"),
     ("UI_ln/Icons",                                       "UI_ln/Icons"),
     ("UI_ln/IconsDark",                                   "UI_ln/IconsDark"),
 ]

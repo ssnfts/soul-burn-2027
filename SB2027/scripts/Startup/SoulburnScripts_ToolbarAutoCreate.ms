@@ -1,8 +1,9 @@
 -------------------------------------------------------------------------------
 -- SoulburnScripts_ToolbarAutoCreate.ms
 -- By SoulBurn 2027 Update
--- v 1.00
+-- v 1.01
 -- Created On: 05/01/25
+-- Updated: cuix fallback via cui.loadConfig added
 -- tested using Max 2027
 --
 -- PURPOSE:
@@ -25,6 +26,9 @@ if not (doesFileExist _autoCreate) then
 (
 	print (_logTag + " soulburnToolbarAutoCreate.ms not found at: " + _autoCreate)
 	print (_logTag + " Toolbar auto-create skipped.")
+	-- Load SoulBurn toolbar if not already present (fallback: UI_ln placement)
+	local cuixPath = (getDir #ui) + "\\SoulburnScripts.cuix"
+	if doesFileExist cuixPath do cui.loadConfig cuixPath
 )
 else
 (

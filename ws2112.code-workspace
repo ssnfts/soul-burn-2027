@@ -1,0 +1,31 @@
+{
+  "folders": [
+    {
+      "name": "SoulBurn 2027 — Main",
+      "path": "SB2027"
+    },
+    {
+      "name": "SoulBurn Scripts (root)",
+      "path": "."
+    },
+    {
+      "name": "Cinematic Cameras",
+      "path": "cinematic_cameras"
+    },
+    {
+      "name": "tyFlow Scripts",
+      "path": "tyflow_scripts"
+    },
+    {
+      "name": "Atlas MCP Server",
+      "path": "max_mcp_server"
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "*.ms": "maxscript",
+      "*.mcr": "maxscript"
+    },
+    "editor.tabSize": 4
+  }
+}

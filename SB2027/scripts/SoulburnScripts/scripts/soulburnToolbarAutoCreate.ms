@@ -16,9 +16,14 @@ local logTag = "[SoulburnToolbar]"
 
 if tbCreated != SB_TOOLBAR_VERSION then (
 	-- Build the toolbar
+	-- Primary location: #plugcfg\SoulburnScripts\ (en-US\plugcfg\SoulburnScripts on Max 2027)
 	local cuixPath = (getdir #plugcfg) + "\\SoulburnScripts\\SoulburnScripts.cuix"
+	-- Fallback: UI_ln\ (direct ENU\UI_ln placement used by cui.loadConfig on some Max builds)
+	local cuixPathAlt = (getdir #ui) + "\\SoulburnScripts.cuix"
+	-- Use whichever path exists; prefer the plugcfg location
+	if not (doesFileExist cuixPath) do cuixPath = cuixPathAlt
 	if not (doesFileExist cuixPath) then (
-		print (logTag + " SoulburnScripts.cuix not found at: " + cuixPath)
+		print (logTag + " SoulburnScripts.cuix not found at plugcfg or UI_ln locations.")
 		print (logTag + " Toolbar auto-create skipped - run the SoulBurn installer.")
 	)
 	else (

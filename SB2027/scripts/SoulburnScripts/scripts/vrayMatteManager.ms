@@ -1,10 +1,10 @@
 ﻿-------------------------------------------------------------------------------
 -- vrayMatteManager.ms
 -- By Neil Blevins (info@neilblevins.com)
--- v 1.01
+-- v 2.00
 -- Created On: 03/05/19
 -- Modified On: 05/22/19
--- tested using Max 2017
+-- tested using Max 2027 + V-Ray 6/7
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -64,8 +64,23 @@ vMMPosValue = sLibGetSafeUIPos 310 91
 
 -- Functions
 
-fn vrayMatteManager vMMAction = 
+-- v2.00: The VRay_Matte_* user properties are still how V-Ray 6/7 store
+-- per-object matte settings, so that path is unchanged. What was missing is a
+-- renderer check: under Arnold or Corona these properties are written but
+-- never read, so the tool silently did nothing. Warn instead.
+
+fn vrayMatteManager vMMAction =
 	(
+	local rend = sLibWhatsCurrentRenderer()
+	if rend != "vray" then
+		(
+		if not (queryBox ("Current renderer is '" + rend + "', not V-Ray.\n\nThe VRay_Matte_* object properties this tool writes are only read by V-Ray - under " + rend + " they will have no effect.\n\nWrite them anyway?") title:"vrayMatteManager") then return false
+		)
+	if selection.count == 0 then
+		(
+		MessageBox "Select one or more objects first." title:"vrayMatteManager"
+		return false
+		)
 	for obj in selection do
 		(
 		if vMMAction == 1 then
@@ -111,7 +126,7 @@ fn vMMCloseOpenUI pos =
 	(
 	if vMMFloater != undefined then CloseRolloutFloater vMMFloater
 	vMMDefineUI()
-	vMMFloater = newRolloutFloater "vrayMatteManager v1.01" 310 91 pos.x pos.y
+	vMMFloater = newRolloutFloater "vrayMatteManager v2.00" 310 91 pos.x pos.y
 	addRollout vMMRollout vMMFloater
 	)
 

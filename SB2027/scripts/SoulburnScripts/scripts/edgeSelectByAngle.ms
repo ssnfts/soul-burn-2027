@@ -122,7 +122,7 @@ fn edgeSelectByAngle eSBALow eSBAHigh =
 								normal1 = myMod.getFaceNormal a[1]
 								normal2 = myMod.getFaceNormal a[2]
 								theAngle = acos(dot (normalize normal1) (normalize normal2))
-								if theAngle >= (LowVal - 0.001) and theAngle <= (HighVal + 0.001) then append finalEdges i
+								if theAngle >= (LowVal - 0.1) and theAngle <= (HighVal + 0.1) then append finalEdges i
 								)
 							)
 						myMod.SetEPolySelLevel #edge

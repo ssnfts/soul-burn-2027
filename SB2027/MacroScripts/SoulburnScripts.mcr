@@ -121,19 +121,6 @@ MacroScript blendedCubeProjectionManagerUI category:"SoulburnScripts" tooltip:"b
 	blendedCubeProjectionManagerUI()
 	)
 
-MacroScript calculatorLauncher category:"SoulburnScripts" tooltip:"calculatorLauncher" Icon:#("SoulburnScripts_calculatorLauncher",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/calculatorLauncher.ms"
-	on execute do calculatorLauncherDefaults()
-	on Altexecute type do calculatorLauncherUI()
-	)
-	
-MacroScript calculatorLauncherUI category:"SoulburnScripts" tooltip:"calculatorLauncherUI" Icon:#("SoulburnScripts_calculatorLauncherUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/calculatorLauncher.ms"
-	calculatorLauncherUI()
-	)
-	
 MacroScript cameraFromPerspView category:"SoulburnScripts" tooltip:"cameraFromPerspView" Icon:#("SoulburnScripts_cameraFromPerspView",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/cameraFromPerspView.ms"
@@ -377,19 +364,6 @@ MacroScript instanceTrimmerUI category:"SoulburnScripts" tooltip:"instanceTrimme
 	instanceTrimmerUI()
 	)
 	
-MacroScript layerCleaner category:"SoulburnScripts" tooltip:"layerCleaner" Icon:#("SoulburnScripts_layerCleaner",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/layerCleaner.ms"
-	on execute do layerCleanerDefaults()
-	on Altexecute type do layerCleanerUI()
-	)
-	
-MacroScript layerCleanerUI category:"SoulburnScripts" tooltip:"layerCleanerUI" Icon:#("SoulburnScripts_layerCleanerUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/layerCleaner.ms"
-	layerCleanerUI()
-	)
-
 MacroScript materialFromSelectedObject category:"SoulburnScripts" tooltip:"materialFromSelectedObject" Icon:#("SoulburnScripts_materialFromSelectedObject",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/materialFromSelectedObject.ms"
@@ -475,19 +449,6 @@ MacroScript materialRemoverUI category:"SoulburnScripts" tooltip:"materialRemove
 	(
 	Include "$userScripts/SoulburnScripts/scripts/materialRemover.ms"
 	materialRemoverUI()
-	)
-
-MacroScript maxfileOldVersionSaver category:"SoulburnScripts" tooltip:"maxfileOldVersionSaver" Icon:#("SoulburnScripts_maxfileOldVersionSaver",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/maxfileOldVersionSaver.ms"
-	on execute do maxfileOldVersionSaverDefaults()
-	on Altexecute type do maxfileOldVersionSaverUI()
-	)
-
-MacroScript maxfileOldVersionSaverUI category:"SoulburnScripts" tooltip:"maxfileOldVersionSaverUI" Icon:#("SoulburnScripts_maxfileOldVersionSaverUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/maxfileOldVersionSaver.ms"
-	maxfileOldVersionSaverUI()
 	)
 
 MacroScript mirrorObjectAlongAxis category:"SoulburnScripts" tooltip:"mirrorObjectAlongAxis" Icon:#("SoulburnScripts_mirrorObjectAlongAxis",1)
@@ -693,19 +654,6 @@ MacroScript parentSelectorUI category:"SoulburnScripts" tooltip:"parentSelectorU
 	parentSelectorUI()
 	)
 
-MacroScript pFlowRemover category:"SoulburnScripts" tooltip:"pFlowRemover" Icon:#("SoulburnScripts_pFlowRemover",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/pFlowRemover.ms"
-	on execute do pFlowRemoverDefaults()
-	on Altexecute type do pFlowRemoverUI()
-	)
-	
-MacroScript pFlowRemoverUI category:"SoulburnScripts" tooltip:"pFlowRemoverUI" Icon:#("SoulburnScripts_pFlowRemoverUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/pFlowRemover.ms"
-	pFlowRemoverUI()
-	)
-
 MacroScript pipeMaker category:"SoulburnScripts" tooltip:"pipeMaker" Icon:#("SoulburnScripts_pipeMaker",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/pipeMaker.ms"
@@ -782,19 +730,6 @@ MacroScript selectionRandomizerUI category:"SoulburnScripts" tooltip:"selectionR
 	(
 	Include "$userScripts/SoulburnScripts/scripts/selectionRandomizer.ms"
 	selectionRandomizerUI()
-	)
-
-MacroScript snapShoter category:"SoulburnScripts" tooltip:"snapShoter" Icon:#("SoulburnScripts_snapShoter",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/snapShoter.ms"
-	on execute do snapShoterDefaults()
-	on Altexecute type do snapShoterUI()
-	)
-
-MacroScript snapShoterUI category:"SoulburnScripts" tooltip:"snapShoterUI" Icon:#("SoulburnScripts_snapShoterUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/snapShoter.ms"
-	snapShoterUI()
 	)
 
 MacroScript softSelectionControl category:"SoulburnScripts" tooltip:"softSelectionControl" Icon:#("SoulburnScripts_softSelectionControl",1)
@@ -892,47 +827,6 @@ MacroScript subdivisionAutomatorUI category:"SoulburnScripts" tooltip:"subdivisi
 	(
 	Include "$userScripts/SoulburnScripts/scripts/subdivisionAutomator.ms"
 	subdivisionAutomatorUI()
-	)
-
-MacroScript subdivisionIterationManip category:"SoulburnScripts" tooltip:"subdivisionIterationManip" Icon:#("SoulburnScripts_subdivisionIterationManip",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	on execute do subdivisionIterationManipDefaults()
-	on Altexecute type do subdivisionIterationManipUI()
-	)
-
-MacroScript subdivisionIterationManipUI category:"SoulburnScripts" tooltip:"subdivisionIterationManipUI" Icon:#("SoulburnScripts_subdivisionIterationManipUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	subdivisionIterationManipUI()
-	)
-	
-MacroScript subdivisionIterationManipPolyUp category:"SoulburnScripts" tooltip:"subdivisionIterationManipPolyUp" Icon:#("SoulburnScripts_subdivisionIterationManipPolyUp",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	on execute do subdivisionIterationManip true false false false 1
-	on Altexecute type do subdivisionIterationManipUI()
-	)
-	
-MacroScript subdivisionIterationManipPolyDown category:"SoulburnScripts" tooltip:"subdivisionIterationManipPolyDown" Icon:#("SoulburnScripts_subdivisionIterationManipPolyDown",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	on execute do subdivisionIterationManip true false false false 2
-	on Altexecute type do subdivisionIterationManipUI()
-	)
-
-MacroScript subdivisionIterationManipOSDUp category:"SoulburnScripts" tooltip:"subdivisionIterationManipOSDUp" Icon:#("SoulburnScripts_subdivisionIterationManipOSDUp",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	on execute do subdivisionIterationManip false false false true 1
-	on Altexecute type do subdivisionIterationManipUI()
-	)
-	
-MacroScript subdivisionIterationManipOSDDown category:"SoulburnScripts" tooltip:"subdivisionIterationManipOSDDown" Icon:#("SoulburnScripts_subdivisionIterationManipOSDDown",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/subdivisionIterationManip.ms"
-	on execute do subdivisionIterationManip false false false true 2
-	on Altexecute type do subdivisionIterationManipUI()
 	)
 
 MacroScript subdivisionManager category:"SoulburnScripts" tooltip:"subdivisionManager" Icon:#("SoulburnScripts_subdivisionManager",1)
@@ -1047,19 +941,6 @@ MacroScript transformSelectorUI category:"SoulburnScripts" tooltip:"transformSel
 	transformSelectorUI()
 	)
 	
-MacroScript twoDPlanView category:"SoulburnScripts" tooltip:"twoDPlanView" Icon:#("SoulburnScripts_twoDPlanView",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/twoDPlanView.ms"
-	on execute do twoDPlanViewDefaults()
-	on Altexecute type do twoDPlanViewUI()
-	)
-	
-MacroScript twoDPlanViewUI category:"SoulburnScripts" tooltip:"twoDPlanViewUI" Icon:#("SoulburnScripts_twoDPlanViewUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/twoDPlanView.ms"
-	twoDPlanViewUI()
-	)
-
 MacroScript uniqueObjectFinder category:"SoulburnScripts" tooltip:"uniqueObjectFinder" Icon:#("SoulburnScripts_uniqueObjectFinder",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/uniqueObjectFinder.ms"
@@ -1180,61 +1061,6 @@ MacroScript uVTransferUI category:"SoulburnScripts" tooltip:"uVTransferUI" Icon:
 	uVTransferUI()
 	)
 
-MacroScript vertexAndEdgeConnector category:"SoulburnScripts" tooltip:"vertexAndEdgeConnector" Icon:#("SoulburnScripts_vertexAndEdgeConnector",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnectorDefaults()
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorUI category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorUI" Icon:#("SoulburnScripts_vertexAndEdgeConnectorUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	vertexAndEdgeConnectorUI()
-	)
-
-MacroScript vertexAndEdgeConnectorDialog category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorDialog" Icon:#("SoulburnScripts_vertexAndEdgeConnectorDialog",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector true false 1 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorNoDialog category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorNoDialog" Icon:#("SoulburnScripts_vertexAndEdgeConnectorNoDialog",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector false false 1 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorNoDialog1Seg category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorNoDialog1Seg" Icon:#("SoulburnScripts_vertexAndEdgeConnectorNoDialog1Seg",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector false true 1 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorNoDialog2Seg category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorNoDialog2Seg" Icon:#("SoulburnScripts_vertexAndEdgeConnectorNoDialog2Seg",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector false true 2 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorNoDialog3Seg category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorNoDialog3Seg" Icon:#("SoulburnScripts_vertexAndEdgeConnectorNoDialog3Seg",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector false true 3 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-	
-MacroScript vertexAndEdgeConnectorNoDialog4Seg category:"SoulburnScripts" tooltip:"vertexAndEdgeConnectorNoDialog4Seg" Icon:#("SoulburnScripts_vertexAndEdgeConnectorNoDialog4Seg",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/vertexAndEdgeConnector.ms"
-	on execute do vertexAndEdgeConnector false true 4 0 0
-	on Altexecute type do vertexAndEdgeConnectorUI()
-	)
-
 MacroScript vertexEdgeFaceSelectByNormal category:"SoulburnScripts" tooltip:"vertexEdgeFaceSelectByNormal" Icon:#("SoulburnScripts_vertexEdgeFaceSelectByNormal",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/vertexEdgeFaceSelectByNormal.ms"
@@ -1308,81 +1134,6 @@ MacroScript vertSelectionToObjectUI category:"SoulburnScripts" tooltip:"vertSele
 	vertSelectionToObjectUI()
 	)
 
-MacroScript viewportControl category:"SoulburnScripts" tooltip:"viewportControl" Icon:#("SoulburnScripts_viewportControl",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControlDefaults()
-	on Altexecute type do viewportControlUI()
-	)
-	
-MacroScript viewportControlUI category:"SoulburnScripts" tooltip:"viewportControlUI" Icon:#("SoulburnScripts_viewportControlUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	viewportControlUI()
-	)
-
-MacroScript viewportControlExpertMode category:"SoulburnScripts" tooltip:"viewportControlExpertMode" Icon:#("SoulburnScripts_viewportControlExpertMode",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	viewportControlExpertMode()
-	)
-
-MacroScript viewportControlTop category:"SoulburnScripts" tooltip:"viewportControlTop" Icon:#("SoulburnScripts_viewportControlTop",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 1 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
-MacroScript viewportControlBottom category:"SoulburnScripts" tooltip:"viewportControlBottom" Icon:#("SoulburnScripts_viewportControlBottom",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 2 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
-MacroScript viewportControlFront category:"SoulburnScripts" tooltip:"viewportControlFront" Icon:#("SoulburnScripts_viewportControlFront",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 3 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
-MacroScript viewportControlBack category:"SoulburnScripts" tooltip:"viewportControlBack" Icon:#("SoulburnScripts_viewportControlBack",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 4 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
-MacroScript viewportControlLeft category:"SoulburnScripts" tooltip:"viewportControlLeft" Icon:#("SoulburnScripts_viewportControlLeft",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 5 true true true
-	on Altexecute type do viewportControlUI()
-	)
-	
-MacroScript viewportControlRight category:"SoulburnScripts" tooltip:"viewportControlRight" Icon:#("SoulburnScripts_viewportControlRight",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 6 true true true
-	on Altexecute type do viewportControlUI()
-	)
-	
-MacroScript viewportControlPersp category:"SoulburnScripts" tooltip:"viewportControlPersp" Icon:#("SoulburnScripts_viewportControlPersp",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 7 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
-MacroScript viewportControlCamera category:"SoulburnScripts" tooltip:"viewportControlCamera" Icon:#("SoulburnScripts_viewportControlCamera",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/viewportControl.ms"
-	on execute do viewportControl 8 true true true
-	on Altexecute type do viewportControlUI()
-	)
-
 MacroScript viewportToVFBLoader category:"SoulburnScripts" tooltip:"viewportToVFBLoader" Icon:#("SoulburnScripts_viewportToVFBLoader",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/viewportToVFBLoader.ms"
@@ -1448,19 +1199,6 @@ MacroScript wireColorRandomizerUI category:"SoulburnScripts" tooltip:"wireColorR
 	wireColorRandomizerUI()
 	)
 	
-MacroScript xFormResetter category:"SoulburnScripts" tooltip:"xFormResetter" Icon:#("SoulburnScripts_xFormResetter",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/xFormResetter.ms"
-	on execute do xFormResetterDefaults()
-	on Altexecute type do xFormResetterUI()
-	)
-	
-MacroScript xFormResetterUI category:"SoulburnScripts" tooltip:"xFormResetterUI" Icon:#("SoulburnScripts_xFormResetterUI",1)
-	(
-	Include "$userScripts/SoulburnScripts/scripts/xFormResetter.ms"
-	xFormResetterUI()
-	)
-
 -- ============================================================
 -- SoulBurn 2027 New Scripts
 -- ============================================================
