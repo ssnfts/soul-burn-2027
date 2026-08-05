@@ -1346,5 +1346,27 @@ MacroScript customLightingAssistantUI category:"SoulburnScripts" tooltip:"custom
 	customLightingAssistantUI()
 	)
 
+MacroScript smartLighting category:"SoulburnScripts" tooltip:"smartLighting" Icon:#("SoulburnScripts_smartLighting",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/smart_lighting.ms"
+	on execute do smartLightingDefaults()
+	on Altexecute type do smartLightingUI()
+	)
+
+MacroScript smartLightingUI category:"SoulburnScripts" tooltip:"smartLightingUI" Icon:#("SoulburnScripts_smartLightingUI",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/smart_lighting.ms"
+	smartLightingUI()
+	)
+
+MacroScript uninstallSoulburn
+category:"SoulburnScripts"
+tooltip:"Uninstall SoulBurn Scripts Pack"
+Icon:#("SoulburnScripts_uninstallSoulburn",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/uninstall_soulburn.ms"
+	on execute do uninstallSoulburn()
+	)
+
 )
 -------------------------------------------------------------------------------

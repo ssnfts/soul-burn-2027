@@ -243,6 +243,90 @@ def install_to_version(version_info, options, progress_cb=None, log_cb=None):
     return installed_files
 
 
+def uninstall_from_version(version_info, log_cb=None):
+    """Remove SoulBurn Scripts Pack files from one Max ENU path.
+    Preserves plugcfg\\SoulburnScripts\\ (user presets / INI files).
+    """
+    enu = version_info.get("enu_path", "")
+    if not enu:
+        if log_cb:
+            log_cb(f"  SKIP {version_info['year']}: no ENU path")
+        return
+
+    def _rm_file(rel):
+        path = os.path.join(enu, rel.replace("/", os.sep))
+        if os.path.isfile(path):
+            try:
+                os.remove(path)
+                if log_cb:
+                    log_cb(f"  OK  removed {rel}")
+            except Exception as exc:
+                if log_cb:
+                    log_cb(f"  FAIL {rel}: {exc}")
+
+    def _rm_dir(rel):
+        path = os.path.join(enu, rel.replace("/", os.sep))
+        if os.path.isdir(path):
+            try:
+                shutil.rmtree(path)
+                if log_cb:
+                    log_cb(f"  OK  removed {rel}\\")
+            except Exception as exc:
+                if log_cb:
+                    log_cb(f"  FAIL {rel}\\: {exc}")
+
+    def _rm_glob(directory_rel, pattern):
+        """Remove all files matching pattern inside directory_rel."""
+        directory = os.path.join(enu, directory_rel.replace("/", os.sep))
+        if not os.path.isdir(directory):
+            return
+        import glob as _glob
+        matches = _glob.glob(os.path.join(directory, pattern))
+        for path in matches:
+            try:
+                os.remove(path)
+                if log_cb:
+                    log_cb(f"  OK  removed {os.path.relpath(path, enu)}")
+            except Exception as exc:
+                if log_cb:
+                    log_cb(f"  FAIL {os.path.relpath(path, enu)}: {exc}")
+
+    # --- scripts folder (entire tree, minus plugcfg which is untouched) ---
+    _rm_dir("scripts/SoulburnScripts")
+
+    # --- macro files ---
+    _rm_file("usermacros/SoulburnScripts.mcr")
+    _rm_file("usermacros/SoulburnScriptsExtras.mcr")
+
+    # --- startup scripts ---
+    _rm_file("scripts/startup/SoulburnScripts_AtlasAutoStart.ms")
+    _rm_file("scripts/startup/SoulburnScripts_ToolbarAutoCreate.ms")
+
+    # --- icons ---
+    _rm_glob("UI_ln/Icons",     "SoulburnScripts_*")
+    _rm_glob("UI_ln/IconsDark", "SoulburnScripts_*")
+
+    # --- cuix toolbar definition ---
+    _rm_file("UI_ln/SoulburnScripts.cuix")
+    _rm_file("en-US/plugcfg/SoulburnScripts/SoulburnScripts.cuix")
+
+    # --- uninstall registry entry ---
+    try:
+        key_path = (r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+                    rf"\SoulburnScripts_{version_info['year']}")
+        winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_path)
+        if log_cb:
+            log_cb("  OK  removed registry uninstall entry")
+    except FileNotFoundError:
+        pass
+    except Exception as exc:
+        if log_cb:
+            log_cb(f"  WARN registry cleanup: {exc}")
+
+    if log_cb:
+        log_cb(f"  -- plugcfg\\SoulburnScripts\\ preserved (user presets kept)")
+
+
 def run_pip(python_exe, packages, log_cb=None):
     """
     Install Python packages into Max's embedded Python.
@@ -358,7 +442,7 @@ class InstallerApp(tk.Tk):
 
     def _show_page(self, n):
         self._page = n
-        [self._page0, self._page1, self._page2, self._page3][n]()
+        [self._page0, self._page1, self._page2, self._page3, self._page4][n]()
 
     # ── Page 0: Welcome ────────────────────────────────────────────────────
 
@@ -517,7 +601,97 @@ class InstallerApp(tk.Tk):
         readme = os.path.join(SOURCE_ROOT, "README.md")
         if os.path.exists(readme):
             self._button(btn_row, "Open README", lambda: os.startfile(readme)).pack(side="left")
+        self._button(btn_row, "Uninstall SoulBurn", lambda: self._show_page(4),
+                     width=18).pack(side="right", padx=(0, 8))
         self._button(btn_row, "Close", self.destroy, width=10).pack(side="right")
+
+    # ── Page 4: Uninstall ──────────────────────────────────────────────────
+
+    def _page4(self):
+        self._clear()
+        f = self._frame
+        self._label(f, "Uninstall SoulBurn Scripts Pack", 14, "#f38ba8", bold=True).pack(anchor="w")
+        self._label(f, "Detected installations (ENU\\scripts\\SoulburnScripts\\ present):",
+                    10, "#a6adc8").pack(anchor="w", pady=(4, 2))
+
+        # Build list of versions that actually have SoulBurn installed
+        self._uninst_vars = {}
+        uninst_frame = tk.LabelFrame(f, text="", bg="#313244", fg="#cdd6f4",
+                                     relief="flat", padx=10, pady=6)
+        uninst_frame.pack(fill="x", pady=4)
+
+        detected_any = False
+        for v in self.versions:
+            enu = v.get("enu_path", "") or ""
+            sb_dir = os.path.join(enu, "scripts", "SoulburnScripts")
+            if not os.path.isdir(sb_dir):
+                continue
+            detected_any = True
+            var = tk.BooleanVar(value=True)
+            self._uninst_vars[v["year"]] = (var, v)
+            row = tk.Frame(uninst_frame, bg="#313244")
+            row.pack(anchor="w", fill="x", pady=1)
+            tk.Checkbutton(
+                row,
+                text=f"3ds Max {v['year']}",
+                variable=var, bg="#313244", fg="#cdd6f4",
+                activebackground="#313244", selectcolor="#1e1e2e",
+                font=("Segoe UI", 10, "bold"), width=14, anchor="w"
+            ).pack(side="left")
+            tk.Label(row, text=enu, bg="#313244", fg="#a6adc8",
+                     font=("Segoe UI", 8)).pack(side="left", padx=(4, 0))
+
+        if not detected_any:
+            self._label(uninst_frame,
+                        "No SoulBurn installations detected on this machine.", 10,
+                        "#f9e2af").pack()
+
+        self._uninst_log = scrolledtext.ScrolledText(
+            f, height=10, bg="#181825", fg="#cdd6f4",
+            font=("Consolas", 9), relief="flat", wrap="word"
+        )
+        self._uninst_log.pack(fill="both", expand=True, pady=(6, 0))
+
+        btn_row = tk.Frame(f, bg="#1e1e2e")
+        btn_row.pack(side="bottom", pady=10, fill="x")
+        self._button(btn_row, "← Back", lambda: self._show_page(3)).pack(side="left")
+        if detected_any:
+            self._button(btn_row, "Uninstall Selected", self._start_uninstall,
+                         width=18).pack(side="right")
+
+    def _start_uninstall(self):
+        selected = [(year, v) for year, (var, v) in self._uninst_vars.items() if var.get()]
+        if not selected:
+            messagebox.showwarning("No target selected",
+                                   "Please select at least one version to uninstall from.")
+            return
+        if not messagebox.askyesno(
+            "Confirm Uninstall",
+            "This will remove all SoulBurn Scripts Pack files from the selected "
+            "Max version(s).\n\nUser presets in plugcfg\\SoulburnScripts\\ will be "
+            "PRESERVED.\n\nContinue?"
+        ):
+            return
+        t = threading.Thread(
+            target=self._do_uninstall,
+            args=([v for _, v in selected],),
+            daemon=True
+        )
+        t.start()
+
+    def _do_uninstall(self, selected_versions):
+        def log(msg):
+            self._uninst_log.insert("end", msg + "\n")
+            self._uninst_log.see("end")
+            self.update_idletasks()
+
+        for v in selected_versions:
+            log(f"\n{'─'*50}")
+            log(f"Uninstalling from 3ds Max {v['year']}...")
+            uninstall_from_version(v, log_cb=log)
+
+        log(f"\n{'═'*50}")
+        log("✓ Uninstall complete. User presets in plugcfg\\SoulburnScripts\\ were preserved.")
 
 
 # ---------------------------------------------------------------------------
