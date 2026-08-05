@@ -284,26 +284,10 @@ def run_pip(python_exe, packages, log_cb=None):
             log_cb("  pip not found — bootstrapping via ensurepip...")
         rc = _run([python_exe, "-m", "ensurepip", "--upgrade"], "ensurepip")
         if rc != 0:
-            # ensurepip can also fail if pip is present but just not on PATH.
-            # Try get-pip.py as a last resort by downloading it.
             if log_cb:
-                log_cb("  ensurepip failed (exit %d) — trying get-pip.py" % rc)
-            import urllib.request, tempfile
-            get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
-            try:
-                tmp = tempfile.mktemp(suffix=".py")
-                urllib.request.urlretrieve(get_pip_url, tmp)
-                rc2 = _run([python_exe, tmp], "get-pip.py")
-                if rc2 != 0 and log_cb:
-                    log_cb("  FAIL Could not install pip (get-pip.py exit %d)." % rc2)
-                    log_cb("  TIP: Open a command prompt as Admin and run:")
-                    log_cb(f'       "{python_exe}" -m ensurepip --upgrade')
-                    return
-            except Exception as dl_exc:
-                if log_cb:
-                    log_cb(f"  FAIL Could not download get-pip.py: {dl_exc}")
-                    log_cb("  TIP: Install pip manually in Max's Python, then re-run installer.")
-                return
+                log_cb("  FAIL ensurepip failed (exit %d). Install pip manually." % rc)
+                log_cb(f'  TIP: Run as Admin: "{python_exe}" -m ensurepip --upgrade')
+            return
 
     # ── Stage 2: upgrade pip itself ───────────────────────────────────────────
     _run([python_exe, "-m", "pip", "install", "--upgrade", "pip"], "pip self-upgrade")

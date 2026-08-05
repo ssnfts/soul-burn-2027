@@ -82,15 +82,7 @@ global cLAStatus = "Ready."
 
 -- Functions
 
-fn cLAResolveClass className =
-	(
-	-- Resolves a render element / light filter class by name at runtime.
-	-- Returns undefined when the renderer that provides it is not installed.
-	local c = undefined
-	try (c = execute className) catch (c = undefined)
-	if (classof c == UndefinedClass) then c = undefined
-	return c
-	)
+fn cLAResolveClass className = ( try (execute className) catch (undefined) )
 
 fn cLASampledColor obj =
 	(
@@ -389,23 +381,6 @@ fn cLALoadDef =
 		cLAAOVUVsValue = sLibGetINIBoolean cLAInputFilename "customLightingAssistant" "cLAAOVUVsValue" false
 		cLAAOVNormalsValue = sLibGetINIBoolean cLAInputFilename "customLightingAssistant" "cLAAOVNormalsValue" true
 		cLAPosValue = sLibGetINIPoint2 cLAInputFilename "customLightingAssistant" "cLAPosValue" (sLibGetSafeUIPos 300 560)
-		)
-	else
-		(
-		cLABouncesValue = 3
-		cLABounceMultValue = 0.15
-		cLABounceDistValue = 100.0
-		cLAMergeEXRValue = true
-		cLAGroupNameValue = "key"
-		cLAAOVDiffuseValue = true
-		cLAAOVSpecularValue = true
-		cLAAOVSSSValue = false
-		cLAAOVEmissionValue = false
-		cLAAOVDepthValue = true
-		cLAAOVPositionValue = false
-		cLAAOVUVsValue = false
-		cLAAOVNormalsValue = true
-		cLAPosValue = sLibGetSafeUIPos 300 560
 		)
 	)
 

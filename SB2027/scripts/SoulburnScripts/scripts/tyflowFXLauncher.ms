@@ -109,13 +109,7 @@ fn tFXGetPyLibPath =
 	return ((getdir #userScripts) + "\\SoulburnScripts\\lib\\tyfx.py")
 	)
 
-fn tFXCheckTyFlow =
-	(
-	local result = false
-	try (result = ((classOf tyFlow) != UndefinedClass))
-	catch ()
-	return result
-	)
+fn tFXCheckTyFlow = ( try ((classOf tyFlow) != UndefinedClass) catch false )
 
 fn tFXNodeListLiteral namesStr =
 	(
@@ -347,19 +341,6 @@ fn tFXLoadDef =
 		tFXSparksFloorNames = sLibGetINIString f "tyflowFX" "tFXSparksFloorNames" ""
 		tFXSparksDistanceValue = sLibGetINIFloat f "tyflowFX" "tFXSparksDistanceValue" 3650.0
 		tFXPosValue = sLibGetINIPoint2 f "tyflowFX" "tFXPosValue" (sLibGetSafeUIPos 380 470)
-		)
-	else
-		(
-		tFXSpineName = ""
-		tFXDryRunValue = false
-		tFXSmokeEndFrameValue = 100; tFXSmokeWindBearingValue = 270.0
-		tFXSmokeWindSpeedValue = 5.0; tFXSmokeSpeedThresholdValue = 30.0
-		tFXSmokeSiteZValue = 0.0; tFXSmokeEmitterNames = ""
-		tFXDebrisEndFrameValue = 100; tFXDebrisSiteZValue = 0.0
-		tFXDebrisFPSValue = 24; tFXDebrisWingNames = ""; tFXDebrisDistanceValue = 3650.0
-		tFXSparksEndFrameValue = 100; tFXSparksSiteZValue = 0.0
-		tFXSparksFPSValue = 24; tFXSparksFloorNames = ""; tFXSparksDistanceValue = 3650.0
-		tFXPosValue = sLibGetSafeUIPos 380 470
 		)
 	)
 

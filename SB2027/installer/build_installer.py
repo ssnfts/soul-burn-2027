@@ -42,18 +42,7 @@ include_files = [(s, d) for s, d in include_files if os.path.exists(s)]
 # ---------------------------------------------------------------------------
 build_exe_options = {
     "build_exe": DIST_DIR,
-    "packages": [
-        "tkinter",
-        "winreg",
-        "subprocess",
-        "threading",
-        "json",
-        "shutil",
-        "urllib.request",
-        "email",
-        "http",
-        "logging",
-    ],
+    "packages": ["tkinter", "winreg"],
     "excludes": [
         # Heavy packages we don't use in the installer itself
         "pandas",

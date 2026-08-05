@@ -185,15 +185,6 @@ fn mMGLoadDef =
 		mMGAutoConvertValue = sLibGetINIBoolean mMGInputFilename "maxMazeGenerator" "mMGAutoConvertValue" true
 		mMGPosValue = sLibGetINIPoint2 mMGInputFilename "maxMazeGenerator" "mMGPosValue" (sLibGetSafeUIPos 280 300)
 		)
-	else
-		(
-		mMGSeedValue = 42
-		mMGBraidValue = 0.0
-		mMGDepthValue = 2.0
-		mMGWallWidthValue = 0.3
-		mMGAutoConvertValue = true
-		mMGPosValue = sLibGetSafeUIPos 280 300
-		)
 	)
 
 fn mMGSaveDef =
