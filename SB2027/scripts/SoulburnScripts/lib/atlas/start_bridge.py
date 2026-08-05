@@ -8,9 +8,9 @@ the one that opens by default, without fighting MaxScript string quoting:
 
 From the Python listener you can equally just import atlas_max_bridge directly.
 
-Either way this must run on the main thread — the bridge creates its QTimer
-here, and a QTimer created off the main thread would never fire, leaving every
-command to time out.
+Either way this must run on the main thread — the bridge registers its
+MaxScript tickCallback here, and a callback registered off the main thread
+is unreliable in Max 2025+.
 """
 
 import os

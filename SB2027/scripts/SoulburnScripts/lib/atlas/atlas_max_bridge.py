@@ -7,17 +7,18 @@ Start it from the MAXScript listener (the one that opens by default):
 
 Architecture — the DCC bridge pattern:
 
-    socket thread -> queue -> QTimer on the main thread -> pymxs -> result
+    socket thread -> queue -> pymxs.mxstoken() on the main thread -> pymxs -> result
 
 The 3ds Max API is **main-thread only**. Calling pymxs from a socket handler
 thread corrupts scene state or hard-crashes Max, and the crash lands minutes
-later somewhere unrelated, so it is nearly impossible to attribute. Every call
-is marshalled onto the main thread through a QTimer, with the socket thread
-blocking on an Event so the call still looks synchronous to the caller.
+later somewhere unrelated, so it is nearly impossible to attribute. Every job
+enqueued by the socket thread is drained by a MaxScript tickCallback that fires
+on the main thread; ``pymxs.mxstoken()`` is held while each job executes, which
+is the pattern recommended for threaded Python in Max 2025+.
 
-If PySide6 cannot be imported the bridge **refuses to start** rather than
-falling back to direct calls: a bridge that runs and crashes the host hours
-later is worse than one that will not start.
+No PySide6 dependency: Max 2027 ships Python 3.13 whose PySide6 QtCore.pyd
+cannot load against Max's own Qt6Core.dll, producing a DLL load failure.
+``pymxs.mxstoken()`` is the correct replacement.
 
 This module holds only the transport and lifecycle — the parts that own a bound
 socket and rarely change. All command handling lives in ``atlas_max_handlers``,
@@ -36,33 +37,8 @@ import sys
 import threading
 import traceback
 
-# ── Ensure Max's own PySide6 wins over any pip-installed copy ─────────────────
-# Max ships PySide6 built against its own Qt DLLs in its program-dir site-packages.
-# If a user ran `pip install PySide6` that copy lands in Roaming/Python313/
-# site-packages which Python searches BEFORE the program-dir packages — its Qt
-# DLLs are a different build and cause "DLL load failed while importing QtCore".
-# Fix: move the Max site-packages entry to the front of sys.path so its PySide6
-# is found first, then remove any Roaming PySide6 stubs that shadow it.
-# Ensure Max's own PySide6 (built against its Qt DLLs) is found before any
-# pip-installed copy that may have landed in Roaming\Python313\site-packages.
-_MAX_SITE = os.path.normpath(os.path.join(os.path.dirname(sys.executable), "Lib", "site-packages"))
-if _MAX_SITE in sys.path:
-    sys.path.remove(_MAX_SITE)
-sys.path.insert(0, _MAX_SITE)
-# ──────────────────────────────────────────────────────────────────────────────
-
 try:
-    from PySide6 import QtCore
-except ImportError as _exc:  # pragma: no cover - depends on host
-    raise RuntimeError(
-        "Atlas bridge requires PySide6 to marshal calls onto the 3ds Max main "
-        "thread. Without it, pymxs calls from the socket thread would crash Max "
-        "unpredictably. Refusing to start.\n\n"
-        "sys.path searched:\n" + "\n".join(f"  {p}" for p in sys.path)
-    ) from _exc
-
-try:
-    import pymxs  # noqa: F401  (imported for the availability check)
+    import pymxs
 except ImportError as _exc:  # pragma: no cover
     raise RuntimeError(
         "Atlas bridge must run inside 3ds Max (pymxs not importable)."
@@ -104,7 +80,7 @@ class _Bridge:
         self.host = host
         self.port = port
         self.queue: "queue.Queue[_Job]" = queue.Queue()
-        self.timer: QtCore.QTimer | None = None
+        self._ticker_installed: bool = False
         self.server: socket.socket | None = None
         self.thread: threading.Thread | None = None
         self.running = False
@@ -218,12 +194,18 @@ class _Bridge:
         self.server = srv
         self.running = True
 
-        # The QTimer must be created on the main thread, which is why start()
-        # has to be called from the listener rather than from a thread.
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(TICK_MS)
-        self.timer.timeout.connect(self._tick)
-        self.timer.start()
+        # Register a MaxScript tickCallback to drain the job queue on the main
+        # thread at ~30 fps. pymxs.mxstoken() is held while each job runs,
+        # which is the thread-safe pattern for Max 2025+. No PySide6 needed.
+        pymxs.runtime.callbacks.addScript(
+            pymxs.runtime.Name("tickCallback"),
+            (
+                "python.Execute "
+                "'import atlas_max_bridge as _b; _b._BRIDGE._tick()'"
+            ),
+            id=pymxs.runtime.Name("AtlasBridgeTicker"),
+        )
+        self._ticker_installed = True
 
         self.thread = threading.Thread(target=self._serve, daemon=True)
         self.thread.start()
@@ -234,9 +216,11 @@ class _Bridge:
 
     def stop(self):
         self.running = False
-        if self.timer is not None:
-            self.timer.stop()
-            self.timer = None
+        if self._ticker_installed:
+            pymxs.runtime.callbacks.removeScripts(
+                id=pymxs.runtime.Name("AtlasBridgeTicker")
+            )
+            self._ticker_installed = False
         if self.server is not None:
             try:
                 self.server.close()
