@@ -87,7 +87,12 @@
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="maxMazeGeneratorUI`SoulburnScripts" tip="Max Maze Generator UI" label="Max Maze Generator UI" />
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="customLightingAssistant`SoulburnScripts" tip="Custom Lighting Assistant" label="Custom Lighting Assistant" />
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="customLightingAssistantUI`SoulburnScripts" tip="Custom Lighting Assistant UI" label="Custom Lighting Assistant UI" />
-            </Items>
+                    <Item typeID="3" type="CTB_SEPARATOR" width="6" height="16" orientation="31" visible="1" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="smartLighting`SoulburnScripts" tip="Smart Lighting Assistant" label="Smart Lighting" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="smartLightingUI`SoulburnScripts" tip="Smart Lighting Assistant UI" label="Smart Lighting UI" />
+        <Item typeID="3" type="CTB_SEPARATOR" width="6" height="16" orientation="31" visible="1" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="uninstallSoulburn`SoulburnScripts" tip="Uninstall SoulBurn Scripts Pack" label="Uninstall SoulBurn" />
+        </Items>
         </Window>
     </CUIWindows>
 </ADSK_CUI>

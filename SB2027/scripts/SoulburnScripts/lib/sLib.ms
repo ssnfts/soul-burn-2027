@@ -331,6 +331,15 @@ global sLibGetArnoldLightMaps
 global sLibGetCoronaLightMaps
 global sLibGetAllPhysicalMaterials
 
+-- Typed INI Readers (v2.00)
+global sLibGetINIInteger
+global sLibGetINIFloat
+global sLibGetINIString
+global sLibGetINIBoolean
+global sLibGetINIPoint2
+global sLibGetINIPoint3
+global sLibGetINIColor
+
 -- SoulburnScripts
 global sLibSSPrintHelp
 global sLibSSFindTextFragment

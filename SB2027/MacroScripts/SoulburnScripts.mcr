@@ -1359,10 +1359,7 @@ MacroScript smartLightingUI category:"SoulburnScripts" tooltip:"smartLightingUI"
 	smartLightingUI()
 	)
 
-MacroScript uninstallSoulburn
-category:"SoulburnScripts"
-tooltip:"Uninstall SoulBurn Scripts Pack"
-Icon:#("SoulburnScripts_uninstallSoulburn",1)
+MacroScript uninstallSoulburn category:"SoulburnScripts" tooltip:"Uninstall SoulBurn Scripts Pack" Icon:#("SoulburnScripts_uninstallSoulburn",1)
 	(
 	Include "$userScripts/SoulburnScripts/scripts/uninstall_soulburn.ms"
 	on execute do uninstallSoulburn()
