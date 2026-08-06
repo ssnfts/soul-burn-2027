@@ -48,6 +48,7 @@ global cLAEnableAOVs
 global cLAAssignLightGroup
 global cLAAddLightFilter
 global cLAResolveClass
+global cLAGroupId
 global cLASampledColor
 global cLAHelp
 global cLALoadDef
@@ -83,6 +84,17 @@ global cLAStatus = "Ready."
 -- Functions
 
 fn cLAResolveClass className = ( try (execute className) catch (undefined) )
+
+fn cLAGroupId gname =
+	(
+	-- Stable per-name G-buffer ID for Corona light groups. Using the name's
+	-- character count would collide ("key" and "rim" are both 3), so hash the
+	-- characters instead and keep it inside Max's 1..65535 effect ID range.
+	local h = 0
+	for i = 1 to gname.count do h = (h * 31 + (bit.charAsInt gname[i])) as integer
+	h = (mod (abs h) 65534) as integer
+	return (h + 1)
+	)
 
 fn cLASampledColor obj =
 	(
@@ -265,15 +277,17 @@ fn cLAAssignLightGroup gname =
 	local failed = 0
 	for L in lights do
 		(
-		local set = false
+		-- NB: do not name this "set" - that is a reserved MaxScript keyword and
+		-- makes the whole file fail to compile with "at set, expected name".
+		local wasSet = false
 		case r of
 			(
-			"arnold": try (L.aiAovLightGroupPrefix = gname; set = true) catch ()
-			"corona": try (L.effectID = (gname.count); set = true) catch ()
+			"arnold": try (L.aiAovLightGroupPrefix = gname; wasSet = true) catch ()
+			"corona": try (L.effectID = (cLAGroupId gname); wasSet = true) catch ()
 			default: ()
 			)
-		if not set then try (setUserProp L "LightGroup" gname; set = true) catch ()
-		if set then done += 1 else failed += 1
+		if not wasSet then try (setUserProp L "LightGroup" gname; wasSet = true) catch ()
+		if wasSet then done += 1 else failed += 1
 		)
 	global cLAStatus = ("Light group '" + gname + "' set on " + (done as string) + " light(s)" + \
 		(if failed > 0 then (", " + (failed as string) + " failed") else ""))

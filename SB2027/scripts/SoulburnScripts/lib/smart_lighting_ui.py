@@ -28,15 +28,32 @@ try:
         QCheckBox, QGroupBox, QScrollArea, QSizePolicy, QFrame, QSpinBox,
         QDoubleSpinBox,
     )
-except ImportError:
-    from PySide2 import QtCore, QtWidgets, QtGui
-    from PySide2.QtCore import Qt, Signal
-    from PySide2.QtWidgets import (
-        QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
-        QPushButton, QLabel, QSlider, QComboBox, QListWidget, QListWidgetItem,
-        QCheckBox, QGroupBox, QScrollArea, QSizePolicy, QFrame, QSpinBox,
-        QDoubleSpinBox,
-    )
+except Exception as _pyside6_err:
+    # PySide6 can fail with a DLL load error (not ImportError) when a pip copy
+    # shadows Max's own Qt, so catch Exception, not ImportError. If PySide2 is
+    # also absent we must not let a raw ModuleNotFoundError escape - report
+    # something the artist can act on instead.
+    try:
+        from PySide2 import QtCore, QtWidgets, QtGui
+        from PySide2.QtCore import Qt, Signal
+        from PySide2.QtWidgets import (
+            QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
+            QPushButton, QLabel, QSlider, QComboBox, QListWidget, QListWidgetItem,
+            QCheckBox, QGroupBox, QScrollArea, QSizePolicy, QFrame, QSpinBox,
+            QDoubleSpinBox,
+        )
+    except Exception as _pyside2_err:
+        # Every class below needs Qt, so the module genuinely cannot load.
+        # Raise something the artist can act on rather than a bare
+        # ModuleNotFoundError naming PySide2, which is not the real problem.
+        raise RuntimeError(
+            "smartLighting needs Qt inside Max and neither binding loaded.\n"
+            "  PySide6: %s\n  PySide2: %s\n\n"
+            "Usual cause: a pip-installed PySide6 shadowing Max's own copy. Fix with\n"
+            '  "%s" -m pip uninstall PySide6 PySide6-Addons PySide6-Essentials\n\n'
+            "The MaxScript tool 'customLightingAssistant' covers the same ground "
+            "without Qt." % (_pyside6_err, _pyside2_err, sys.executable)
+        )
 
 import pymxs
 rt = pymxs.runtime

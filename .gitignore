@@ -36,3 +36,10 @@ desktop.ini
 *.bak
 *.mxsbak
 maxscrpt.dsk
+
+# recordings are large binaries - keep them out of the repo
+SB2027/dev/*.mp4
+SB2027/dev/ffmpeg*.log
+SB2027/dev/TOOLBAR_DIAG.txt
+*.typeN.bak
+*.pre-soulburn.bak

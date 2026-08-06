@@ -1,8 +1,9 @@
 # SoulBurn 2027 — Full Task Log
 
-**Repository:** `https://github.com/ssnfts/soul-burn-2027`  
-**Working directory:** `c:\Users\mabdu\Downloads\SoulburnScriptsPack_3dsMax_v112_R2013toR2022`  
-**Session span:** 2026-08-06 00:57 → 03:14 (+04:00) — approx **2 h 17 min**
+**Repository:** `https://github.com/ssnfts/soul-burn-2027`
+**Working directory:** `c:\Users\mabdu\Downloads\SoulburnScriptsPack_3dsMax_v112_R2013toR2022`
+**Session 1 span:** 2026-08-06 00:57 → 03:14 (+04:00) — approx **2 h 17 min**
+**Session 2 span:** 2026-08-06 (follow-up continuation session)
 
 ---
 
@@ -508,4 +509,131 @@ Toolbar: floats on next Max launch with all 206 buttons
 sLib.ms v2.00: all sLibGetINI* functions properly global
 Substance: DLL-safe PySide import guards
 Installer: 29.1 MB cx_Freeze bundle, Uninstall tab included
+```
+
+---
+
+# Session 2 — Handoff + Planning
+
+**Session goal:** Produce a comprehensive handoff document for the next implementation agent, and create a detailed writing-plans-level implementation plan covering all remaining open work.
+
+---
+
+## Message 10 — "continue" (resume from previous handoff)
+
+**💬 USER (turn 1)**
+> *(Previous conversation summary pasted in full — 9-section HANDOFF.md context)* — "continue"
+
+**🤖 BOB**
+
+Activated the `writing-plans` skill.
+
+🛠️ **TERMINAL 1 — 16 parallel file reads**
+```powershell
+# Files read simultaneously to rebuild full context:
+# SB2027/installer_dist/README.md
+# SB2027/tools/make_smart_icons.py        (303 lines — icon generator)
+# SB2027/tools/make_cuix.py               (313 lines — cuix generator)
+# SB2027/scripts/SoulburnScripts/scripts/maxMazeGenerator.ms
+# SB2027/scripts/SoulburnScripts/scripts/customLightingAssistant.ms
+# SB2027/scripts/SoulburnScripts/scripts/tyflowFXLauncher.ms
+# SB2027/scripts/SoulburnScripts/scripts/smart_lighting.ms
+# SB2027/scripts/SoulburnScripts/lib/maze/max_maze.py
+# SB2027/scripts/SoulburnScripts/lib/sLib.ms  (lines 325-360)
+# SB2027/MacroScripts/SoulburnScripts.mcr  (lines 1-80)
+# COURSE-WEEK-3.md                         (lines 1-126)
+# HANDOFF.md                               (full file)
+# TASK_LOG.md                              (symbol overview)
+# C:\Users\mabdu\Downloads\scripts\max_maze.py   (external original)
+# list_files SB2027/, SB2027/tools/, SB2027/scripts/**
+# glob **/*.md
+```
+✅ **VERIFY:** All 16 reads succeeded. Full project state confirmed.
+
+Key discoveries from this read pass:
+- `C:\Users\mabdu\Downloads\scripts\max_maze.py` (external original) has `random.seed(SEED)` on line 35 **inside** `_backtracker()` — ignoring the `seed` argument to `run_maze()`. The lib version at `SB2027/scripts/SoulburnScripts/lib/maze/max_maze.py` has this correctly fixed.
+- The external original also has an **unguarded `run_maze()` call** at line 203 (fires on import). The lib version guards with `if __name__ == "__main__"`.
+- `make_smart_icons.py` generates coloured BMP pixels (amber base colour `(245, 158, 11)` with `factor ≈ 0.51–0.60` produces `clamp(245*0.60)=147` — not white). The white-pixel diagnosis from the previous session was from sampling only the first 8 bytes at offset 54, which is the bottom row of the BMP (stored bottom-up). The diagnosis was misleading; the icons may be visually correct.
+- `customLightingAssistant.ms` is fully implemented: 4 rollouts (GI, AOV, Groups, Filters), correct `sLibGetINI*` calls, undo blocks, all COURSE-WEEK-3.md concepts encoded.
+- `tyflowFXLauncher.ms` v2.00 is complete: spine picker, dry run checkbox, debris/sparks via `raceanim.CrashSpec`, undo block, save/load preset.
+- `maxMazeGenerator.ms` exists and wraps the lib `max_maze.py` via `importlib.util.spec_from_file_location`.
+- 14 scripts have no icon files at all (verified by listing `UI_ln/Icons/`).
+
+**🤖 BOB — Wrote `SB2027_HANDOFF_NEXT_SESSION.md`** (620 lines)
+
+Sections:
+1. Project Goal — one-sentence summary + current blocker (blank white icons)
+2. Complete Repository Layout — every path that matters, external files, live ENU paths
+3. Current Status — 13 done items vs 5 broken/incomplete with root cause analysis and white-pixel BMP diagnosis
+4. Key Technical Details — exact BMP binary layout, 14 missing script icon sets with unique glyph designs per script, 6 hard architectural rules with wrong/right code examples, full sLib.ms v2.00 function table, MCR registration pattern, two-version diff of max_maze.py with seeding bug highlighted
+5. Prioritised Implementation Plan — 6 tasks in order: icons diagnosis/fix → floating toolbar → MaxMaze enhancement → Custom Lighting enhancements → tyFlow rain/dust/fire tabs → installer rebuild
+6. Commands Quick Reference — PowerShell one-liners for all diagnostic, deploy, test, and git operations
+7. Known Issues — 10 specific watch-outs including the stale `__pycache__` files, `.cuix` dual-path deployment, tyfx.py separate git repo, sLib globals order-sensitivity
+8. Suggested Skills Table
+9. External Reference Guide
+
+✅ **VERIFY:** File written at `SB2027_HANDOFF_NEXT_SESSION.md` (620 lines) and copied to `C:\Users\mabdu\AppData\Local\Temp\SB2027_HANDOFF_NEXT_SESSION.md`.
+
+---
+
+## Message 11 — "update the task log md file"
+
+**💬 USER (turn 2)**
+> update the task log md file
+
+**🤖 BOB**
+
+Read full `TASK_LOG.md` (512 lines) to understand exact structure and last entry.
+
+Applied two changes:
+1. Updated header line 5: `Session span:` → `Session 1 span:` + added `Session 2 span:` line.
+2. Appended this complete Session 2 block with all new message entries, a new summary table, and updated final repository state.
+
+✅ **VERIFY:** `TASK_LOG.md` updated in-place.
+
+---
+
+## Session 2 Summary
+
+### Files created this session
+
+| File | Size | Purpose |
+|------|------|---------|
+| `SB2027_HANDOFF_NEXT_SESSION.md` | 620 lines | Detailed handoff for next agent — all context, priorities, architectural rules, command reference |
+| `C:\Users\mabdu\AppData\Local\Temp\SB2027_HANDOFF_NEXT_SESSION.md` | copy | OS-temp copy per handoff skill convention |
+
+### Files modified this session
+
+| File | Change |
+|------|--------|
+| `TASK_LOG.md` | Session header updated; Session 2 entries appended |
+
+### No git commits this session
+
+No code changes were made — this session was documentation-only (handoff document + task log update). The next session should begin with the icon diagnosis task (Task 1 in the handoff) before any commits.
+
+---
+
+## Updated Final Repository State
+
+```
+ssnfts/soul-burn-2027  branch: main  HEAD: 821948f  (unchanged — no new commits this session)
+
+91 MaxScripts  |  206 macros  |  223 cuix items  |  1,213 icons (BUT: 14 scripts have no icon files)
+Atlas bridge: PySide6-free (tickCallback)
+Toolbar: floats on next Max launch with all 206 buttons (BUT: buttons appear white/blank — icons unverified)
+sLib.ms v2.00: all sLibGetINI* functions properly global
+Substance: DLL-safe PySide import guards
+Installer: 29.1 MB cx_Freeze bundle, Uninstall tab included
+maxMazeGenerator.ms: complete (lib/maze/max_maze.py seeding fix confirmed)
+customLightingAssistant.ms: complete (4 rollouts, all COURSE-WEEK-3.md concepts)
+tyflowFXLauncher.ms v2.00: complete (spine picker, dry run, undo, debris/sparks)
+
+OPEN BLOCKERS FOR NEXT SESSION:
+  PRIORITY 1 — Icon white-pixel root cause unconfirmed; 14 scripts missing icon files entirely
+  PRIORITY 2 — Floating toolbar post-install auto-show needs audit + README update
+  PRIORITY 3 — maxMazeGenerator: Random Seed button + icon file
+  PRIORITY 4 — customLightingAssistant: Lighting Theory Tips rollout + Three Constraints note
+  PRIORITY 5 — tyflowFXLauncher: rain/dust/fire tabs (spine-free effects from tyfx.py)
+  PRIORITY 6 — EXE installer rebuild after all icons and scripts are finalised
 ```

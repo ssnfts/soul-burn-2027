@@ -91,11 +91,12 @@ fn uninstallSoulburn =
 		msg += "\nFailed to remove (" + failed.count as string + ") -- may be in use:\n"
 		for fa in failed do msg += "  ! " + fa + "\n"
 	)
-	msg += "\nUser presets preserved: " + (getDir #userPlugcfg) + "\\SoulburnScripts\\"
+	msg += "\nUser presets preserved: " + (getDir #plugcfg) + "\\SoulburnScripts\\"
 	msg += "\n\nRestart 3ds Max to complete removal."
 
 	messageBox msg title:"SoulBurn Uninstall" beep:false
 	return true
 )
 
-uninstallSoulburn()
+-- NOTE: do NOT auto-invoke here. Including this file must not offer to
+-- uninstall the pack; the uninstallSoulburn macro calls the function.

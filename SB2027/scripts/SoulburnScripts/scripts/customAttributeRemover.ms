@@ -59,7 +59,18 @@ fn customAttributeRemover cARAction =
 	undo "customAttributeRemover" on
 		(
 		max create mode
-		if cARAction == 1 then (a = for i in $ collect i)
+		-- v2.00: with nothing selected $ is undefined, and "for i in undefined"
+		-- threw "No map function for undefined". Use the selection collection,
+		-- which is an empty array rather than undefined.
+		if cARAction == 1 then
+			(
+			if selection.count == 0 then
+				(
+				MessageBox "Select one or more objects first, or choose the 'All Scene Objects' mode." title:"customAttributeRemover"
+				return false
+				)
+			a = for i in selection collect i
+			)
 		else (a = for i in $* collect i)
 		for i in a do
 			(

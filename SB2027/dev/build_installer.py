@@ -51,7 +51,10 @@ build_exe_options = {
     "packages": ["tkinter", "winreg", "shutil", "json", "subprocess",
                  "threading", "os", "sys"],
     "include_files": include_files,
-    "build_exe": os.path.join(INSTALLER_DIR, "dist"),
+    # Build straight into the folder that actually ships. Building into
+    # installer/dist and then mirroring to installer_dist produced two bundles
+    # that drifted apart, and the stale one was the one INSTALL.bat launched.
+    "build_exe": os.path.join(SOURCE_ROOT, "installer_dist"),
     "optimize": 2,
     "silent_level": 1,
 }
@@ -82,16 +85,25 @@ setup(
 )
 
 # ---------------------------------------------------------------------------
-# Post-build: rename exe from dist/ to parent folder
+# Post-build check
+#
+# The EXE is a cx_Freeze launcher: it only runs from inside installer_dist,
+# beside its lib/ folder and python3xx.dll. Copying it anywhere else produces a
+# ~23 KB stub that fails on launch, which is exactly the trap this build script
+# used to set by copying it to SB2027/. Do not reintroduce that copy - launch
+# via INSTALL.bat instead.
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__" and len(sys.argv) > 1 and "build_exe" in sys.argv:
-    dist_dir = os.path.join(INSTALLER_DIR, "dist")
+    dist_dir = os.path.join(SOURCE_ROOT, "installer_dist")
     built_exe = os.path.join(dist_dir, "SoulburnScripts_v2_Setup.exe")
-    final_exe = os.path.join(SOURCE_ROOT, "SoulburnScripts_v2_Setup.exe")
+    stray_exe = os.path.join(SOURCE_ROOT, "SoulburnScripts_v2_Setup.exe")
+    if os.path.exists(stray_exe):
+        os.remove(stray_exe)
+        print("Removed stray root EXE (it cannot run outside installer_dist)")
     if os.path.exists(built_exe):
-        import shutil
-        shutil.copy2(built_exe, final_exe)
-        print(f"\nOK EXE built: {final_exe}")
+        n = sum(len(f) for _, _, f in os.walk(dist_dir))
+        print(f"\nOK EXE built: {built_exe}  ({n} files in bundle)")
+        print("Launch it with SB2027\\INSTALL.bat")
     else:
         print(f"\nWARN EXE not found at {built_exe}. Check build output.")

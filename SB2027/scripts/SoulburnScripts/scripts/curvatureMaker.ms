@@ -130,6 +130,15 @@ fn curvatureMaker cMAKBase cMAKBaseColor cMAKSelectBorder cMAKSelectBorderColor 
 		else (ConcaveLowVal = cMAKConcaveLow;ConcaveHighVal = cMAKConcaveHigh)
 		
 		objs = for i in selection collect i
+		-- v2.00: with an empty selection modPanel.addModToSelection adds nothing,
+		-- so modPanel.getCurrentObject() stays undefined and the later
+		-- (modPanel.getCurrentObject()).name assignment threw
+		-- "Unknown property: name in undefined". Bail out with a clear message.
+		if objs.count == 0 then
+			(
+			MessageBox "Select one or more objects first." title:"curvatureMaker"
+			return false
+			)
 		setCommandPanelTaskMode #modify
 		objectsIgnored = 0
 		if cMAKMode == 1 then

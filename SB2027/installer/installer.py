@@ -87,6 +87,12 @@ INSTALL_MAP = [
     ("MacroScripts/SoulburnScripts.cuix",                "UI_ln/SoulburnScripts.cuix"),
     ("UI_ln/Icons",                                       "UI_ln/Icons"),
     ("UI_ln/IconsDark",                                   "UI_ln/IconsDark"),
+    # Max 2025-2027 resolve legacy macroScript BMP icons -- the ones declared
+    # as Icon:#("SoulburnScripts_foo",1) -- from {ENU}\usericons, NOT from
+    # {ENU}\UI_ln\Icons. Installing only to UI_ln produced a toolbar whose
+    # buttons were all blank. Verified in Max 2027: copying the same BMPs to
+    # usericons makes every button render.
+    ("UI_ln/Icons",                                       "usericons"),
 ]
 
 

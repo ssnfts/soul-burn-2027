@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ADSK_CUI>
     <CUIWindows>
-        <Window objectName="SoulburnScripts" name="SoulburnScripts" type="N" cType="1" toolbarRows="1">
+        <Window objectName="SoulburnScripts" name="SoulburnScripts" type="T" cType="1" toolbarRows="1">
             <Items>
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="aligner`SoulburnScripts" tip="Aligner" label="Aligner" />
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="alignerUI`SoulburnScripts" tip="Aligner Ui" label="Aligner Ui" />

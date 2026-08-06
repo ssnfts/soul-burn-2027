@@ -28,11 +28,26 @@ if tbCreated != SB_TOOLBAR_VERSION then (
 	)
 	else (
 		try (
+			-- cui.showToolbar returns a BOOLEAN. The old code ignored it and
+			-- reported success whenever no exception was thrown, which hid the
+			-- real failure: Max only treats a cuix <Window> as a toolbar when
+			-- its type attribute is "T" (every native Max toolbar uses "T").
+			-- With type="N" this silently returned false and nothing appeared.
 			cui.loadConfig cuixPath
-			cui.showToolbar "SoulburnScripts"
+			local shown = cui.showToolbar "SoulburnScripts"
 			cui.saveConfig()
-			setINISetting sbIniPath "Toolbar" "Created" SB_TOOLBAR_VERSION
-			print (logTag + " Toolbar created (v" + SB_TOOLBAR_VERSION + ").")
+			if shown == true then
+				(
+				setINISetting sbIniPath "Toolbar" "Created" SB_TOOLBAR_VERSION
+				print (logTag + " Toolbar shown (v" + SB_TOOLBAR_VERSION + ").")
+				)
+			else
+				(
+				-- Do NOT write the flag - otherwise a failed attempt is never retried.
+				print (logTag + " cui.showToolbar returned false - toolbar not registered.")
+				print (logTag + " Check that SoulburnScripts.cuix has type=\"T\" on its Window element.")
+				print (logTag + " Manual: Customize > Show UI > Show Toolbars > SoulburnScripts")
+				)
 		)
 		catch (
 			local err = getCurrentException()

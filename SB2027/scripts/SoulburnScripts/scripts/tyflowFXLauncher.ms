@@ -174,7 +174,10 @@ fn tFXGenerate effect =
 		return undefined
 		)
 
+	-- getFilenamePath keeps a trailing backslash, and a Python raw string
+	-- cannot end in one, so r'...' would be an unterminated literal. Strip it.
 	local libDir = getFilenamePath pyPath
+	if libDir.count > 0 and libDir[libDir.count] == "\\" then libDir = substring libDir 1 (libDir.count - 1)
 	local outDir = (getdir #temp)
 	local outPath = ""
 	local call = ""
@@ -380,16 +383,15 @@ fn tFXDefineUI =
 		-- Label text cannot be an expression at definition time -- set in "on open"
 		label tFXWarningLabel "tyFlow: checking..." align:#center
 
-		pickbutton tFXSpinePick "Pick Circuit Spline..." width:230 align:#left across:2 \
-			filter:(fn shapeOnly o = (superClassOf o == shape))
+		-- filter: expects a NAMED function reference declared earlier in the
+		-- rollout body. An inline fn in expression position is unsupported.
+		fn tFXShapeOnly o = (superClassOf o == shape)
+		pickbutton tFXSpinePick "Pick Circuit Spline..." width:230 align:#left across:2 filter:tFXShapeOnly
 		checkbox tFXDryRunCheck "Dry Run" checked:false align:#right
 
 		label tFXSpineLabel "Spline: <none>" align:#left
 
-		tabs tFXTabs "FX Type" width:355 height:300
-			(
-			tab tFXSmokeTab "Tyre Smoke"
-				(
+			label tFXHdr0 "---- Tyre Smoke ----" align:#center
 				label tFXSmokeInfo "Emitter names (comma-sep):" align:#left
 				edittext tFXSmokeEmittersEdit "" fieldWidth:300 align:#left
 				spinner tFXSmokeWindBearingSpinner "Wind Bearing (deg): " range:[-360,360,270.0] fieldWidth:60 type:#float align:#right
@@ -416,14 +418,13 @@ fn tFXDefineUI =
 				on tFXSmokeOpenBtn pressed do
 					(
 					if tFXSmokeGeneratedPath != undefined and (doesFileExist tFXSmokeGeneratedPath) then
-						openMaxscriptEditorFile tFXSmokeGeneratedPath
+						edit tFXSmokeGeneratedPath
 					else MessageBox "Generate a script first." title:"tyflowFXLauncher"
 					)
 				on tFXSmokeRunBtn pressed do tFXRunGenerated tFXSmokeGeneratedPath
-				)
 
-			tab tFXDebrisTab "Crash Debris"
-				(
+
+			label tFXHdr33 "---- Crash Debris ----" align:#center
 				label tFXDebrisInfo "Wing names (comma-sep):" align:#left
 				edittext tFXDebrisWingEdit "" fieldWidth:300 align:#left
 				spinner tFXDebrisDistanceSpinner "Crash Distance (m): " range:[0,999999,3650.0] fieldWidth:60 type:#float align:#right
@@ -448,14 +449,13 @@ fn tFXDefineUI =
 				on tFXDebrisOpenBtn pressed do
 					(
 					if tFXDebrisGeneratedPath != undefined and (doesFileExist tFXDebrisGeneratedPath) then
-						openMaxscriptEditorFile tFXDebrisGeneratedPath
+						edit tFXDebrisGeneratedPath
 					else MessageBox "Generate a script first." title:"tyflowFXLauncher"
 					)
 				on tFXDebrisRunBtn pressed do tFXRunGenerated tFXDebrisGeneratedPath
-				)
 
-			tab tFXSparksTab "Crash Sparks"
-				(
+
+			label tFXHdr64 "---- Crash Sparks ----" align:#center
 				label tFXSparksInfo "Floor names (comma-sep):" align:#left
 				edittext tFXSparksFloorEdit "" fieldWidth:300 align:#left
 				spinner tFXSparksDistanceSpinner "Crash Distance (m): " range:[0,999999,3650.0] fieldWidth:60 type:#float align:#right
@@ -480,12 +480,11 @@ fn tFXDefineUI =
 				on tFXSparksOpenBtn pressed do
 					(
 					if tFXSparksGeneratedPath != undefined and (doesFileExist tFXSparksGeneratedPath) then
-						openMaxscriptEditorFile tFXSparksGeneratedPath
+						edit tFXSparksGeneratedPath
 					else MessageBox "Generate a script first." title:"tyflowFXLauncher"
 					)
 				on tFXSparksRunBtn pressed do tFXRunGenerated tFXSparksGeneratedPath
-				)
-			)
+
 
 		label tFXStatusLabel "Ready." align:#left
 
