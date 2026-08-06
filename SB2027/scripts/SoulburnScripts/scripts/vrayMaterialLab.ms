@@ -67,6 +67,7 @@ global vMLImperfRollout
 global vMLValidateRollout
 global vMLReportRollout
 global vMLReportFloater
+global vMLReportLines
 
 global vMLSet
 global vMLSetAny
@@ -694,12 +695,19 @@ fn vMLAddImperfections doDust doEdge doPrint doScratch amount =
 
 fn vMLShowReport title lines =
 	(
+	-- A rollout handler cannot reference an OUTER LOCAL. Using the `lines`
+	-- parameter inside "on vMLReportPrint pressed" failed to compile with
+	--   No outer local variable references permitted here
+	-- and because that aborts the whole file, every macro in the pack stopped
+	-- registering and the entire toolbar went dead. Hand the data to the
+	-- rollout through a global instead.
+	global vMLReportLines = lines
 	if vMLReportFloater != undefined then (try (CloseRolloutFloater vMLReportFloater) catch ())
 	rollout vMLReportRollout title
 		(
-		listbox vMLReportList "" items:lines height:22 width:430 pos:[5,5]
+		listbox vMLReportList "" items:vMLReportLines height:22 width:430 pos:[5,5]
 		button vMLReportPrint "Print To Listener" width:140 pos:[5,375]
-		on vMLReportPrint pressed do (for l in lines do format "%\n" l)
+		on vMLReportPrint pressed do (for l in vMLReportLines do format "%\n" l)
 		button vMLReportClose "Close" width:80 pos:[150,375]
 		on vMLReportClose pressed do (try (CloseRolloutFloater vMLReportFloater) catch ())
 		)

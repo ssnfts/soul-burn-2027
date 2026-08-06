@@ -216,15 +216,40 @@ def install_to_version(version_info, options, progress_cb=None, log_cb=None):
 
         copy_tree(src, dst, _make_cb(enu))
 
-    # Write AtlasAutoStart preference if requested
+    # Write the Atlas bridge auto-start preference.
+    #
+    # This has to match EXACTLY what scripts/startup/SoulburnScripts_AtlasAutoStart.ms
+    # reads, which is:
+    #     (getdir #plugcfg)\SoulburnScripts\presets\atlasBridgeLauncher.ini
+    #     [atlasBridgeLauncher]  aBLAutoStartValue=true
+    # The old code wrote {ENU}\plugcfg\SoulburnScripts\AtlasAutoStart.ini with
+    # [AtlasAutoStart] enabled=true -- wrong directory (getdir #plugcfg is
+    # {ENU}\en-US\plugcfg, not {ENU}\plugcfg), wrong filename and wrong key, so
+    # ticking "auto-start" in the installer never actually started the bridge.
     if options.get("autostart"):
-        plugcfg_dir = os.path.join(enu, "plugcfg", "SoulburnScripts")
-        os.makedirs(plugcfg_dir, exist_ok=True)
-        autostart_ini = os.path.join(plugcfg_dir, "AtlasAutoStart.ini")
-        with open(autostart_ini, "w") as _f:
-            _f.write("[AtlasAutoStart]\nenabled=true\n")
+        presets_dir = os.path.join(enu, "en-US", "plugcfg", "SoulburnScripts",
+                                   "presets")
+        os.makedirs(presets_dir, exist_ok=True)
+        autostart_ini = os.path.join(presets_dir, "atlasBridgeLauncher.ini")
+        # Use configparser so the key lands under the right SECTION. Appending
+        # the line to the end of the file put it under whatever section came
+        # last, where getINISetting could never find it.
+        import configparser as _cp
+        cfg = _cp.ConfigParser()
+        cfg.optionxform = str          # MaxScript keys are case-sensitive
+        if os.path.isfile(autostart_ini):
+            try:
+                cfg.read(autostart_ini, encoding="utf-8-sig")
+            except Exception:
+                cfg = _cp.ConfigParser()
+                cfg.optionxform = str
+        if not cfg.has_section("atlasBridgeLauncher"):
+            cfg.add_section("atlasBridgeLauncher")
+        cfg.set("atlasBridgeLauncher", "aBLAutoStartValue", "true")
+        with open(autostart_ini, "w", encoding="utf-8") as _f:
+            cfg.write(_f, space_around_delimiters=False)
         if log_cb:
-            log_cb("  OK AtlasAutoStart.ini written (enabled=true)")
+            log_cb("  OK atlasBridgeLauncher.ini written (aBLAutoStartValue=true)")
         installed_files.append(autostart_ini)
 
     # Write uninstall manifest
@@ -303,6 +328,12 @@ def uninstall_from_version(version_info, log_cb=None):
     # --- macro files ---
     _rm_file("usermacros/SoulburnScripts.mcr")
     _rm_file("usermacros/SoulburnScriptsExtras.mcr")
+    # Max explodes a loaded .mcr into one file per macro
+    # (SoulburnScripts-aligner.mcr, ...). Leaving those behind means the next
+    # install runs against stale macro definitions, and an uninstall looks
+    # complete while the toolbar still resolves old actions.
+    _rm_glob("usermacros", "SoulburnScripts-*.mcr")
+    _rm_glob("usermacros", "SoulburnScriptsExtras-*.mcr")
 
     # --- startup scripts ---
     _rm_file("scripts/startup/SoulburnScripts_AtlasAutoStart.ms")
@@ -311,10 +342,18 @@ def uninstall_from_version(version_info, log_cb=None):
     # --- icons ---
     _rm_glob("UI_ln/Icons",     "SoulburnScripts_*")
     _rm_glob("UI_ln/IconsDark", "SoulburnScripts_*")
+    # usericons is where Max 2025-2027 actually resolve the legacy BMP icons
+    # from, so INSTALL_MAP writes there too. Uninstall must match, or 1200+
+    # orphaned bitmaps survive every removal.
+    _rm_glob("usericons", "SoulburnScripts_*")
 
-    # --- cuix toolbar definition ---
+    # --- cuix toolbar definition + the state Max derives from it ---
     _rm_file("UI_ln/SoulburnScripts.cuix")
     _rm_file("en-US/plugcfg/SoulburnScripts/SoulburnScripts.cuix")
+    _rm_file("en-US/plugcfg/SoulburnScripts/SoulburnScripts.cuix.layout")
+    # The toolbar "already built" flag. Left behind, a reinstall never
+    # recreates the toolbar because the flag says it is already done.
+    _rm_file("en-US/plugcfg/SoulburnScripts/SoulburnScripts.ini")
 
     # --- uninstall registry entry ---
     try:

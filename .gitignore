@@ -47,3 +47,6 @@ SB2027/dev/TOOLBAR_DIAG.txt
 # Claude Code scratch (worktrees, session state) - not part of the product
 .claude/
 SB2027/.claude/
+SB2027/dev/audit_live.log
+SB2027/dev/render/
+SB2027/dev/*.max
