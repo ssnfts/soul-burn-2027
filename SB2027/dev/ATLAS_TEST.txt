@@ -1,5 +1,2 @@
-start_bridge.py: true
-start returned without exception: true
-_atlasBridgeTimer: undefined
-ping.ok     : false
-ping.result : Bridge not running or connection refused on port 9879
+sLibAtlasBridgePortOpen : true
+aBLPingBridge (button)  : true

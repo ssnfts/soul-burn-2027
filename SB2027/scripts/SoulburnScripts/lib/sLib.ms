@@ -325,6 +325,7 @@ global sLibGetSafeUIPos
 
 -- Atlas Bridge
 global sLibAtlasBridgeCall
+global sLibAtlasBridgePortOpen
 
 -- New Material/Light Collectors (v2.00)
 global sLibGetArnoldLightMaps
@@ -1993,8 +1994,35 @@ fn sLibGetSafeUIPos w h =
 	return [px, py]
 	)
 
+fn sLibAtlasBridgePortOpen =
+	(
+	-- Is the bridge listening? Answered by a bare TCP connect, with NO request.
+	--
+	-- This exists because sLibAtlasBridgeCall CANNOT be used from the Max main
+	-- thread: the bridge executes each job under pymxs.mxstoken(), which needs
+	-- the MaxScript lock, while the main thread is blocked waiting for the
+	-- reply. That is a deadlock by construction, so an in-Max "ping" hangs and
+	-- then times out even though the bridge is perfectly healthy.
+	--
+	-- Connecting and closing needs no work from the main thread, so it is a
+	-- truthful liveness check for the toolbar button.
+	local ok = false
+	try
+		(
+		local c = dotNetObject "System.Net.Sockets.TcpClient"
+		c.Connect "127.0.0.1" 9879
+		ok = c.Connected
+		c.Close()
+		)
+	catch ( ok = false )
+	return ok
+	)
+
 fn sLibAtlasBridgeCall cmdName paramsObj =
 	(
+	-- WARNING: for EXTERNAL callers (a separate AI process on port 9879).
+	-- Calling this from the Max main thread deadlocks - see
+	-- sLibAtlasBridgePortOpen above. Use that for liveness checks in-Max.
 	-- Sends a JSON command to the Atlas MCP bridge running on 127.0.0.1:9879
 	-- Returns a MaxScript struct with .ok (bool) and .result (string) members
 	-- Uses .NET TCP socket - available since Max 2014, no external dependencies
@@ -2007,6 +2035,10 @@ fn sLibAtlasBridgeCall cmdName paramsObj =
 		local client = dotNetObject "System.Net.Sockets.TcpClient"
 		client.Connect host port
 		local stream = client.GetStream()
+		-- The bridge can take a moment on the first call; without a timeout a
+		-- stalled read would hang Max instead of returning an error.
+		try ( stream.ReadTimeout = 30000 ) catch ()
+		try ( stream.WriteTimeout = 30000 ) catch ()
 		-- Build the JSON the bridge actually expects.
 		-- atlas_max_handlers.run_job reads payload["command"] and passes the
 		-- WHOLE payload to the handler as its params, so the key must be
@@ -2018,18 +2050,42 @@ fn sLibAtlasBridgeCall cmdName paramsObj =
 			payload += "," + (paramsObj as string)
 		payload += "}\n"
 		local bytes = (dotNetClass "System.Text.Encoding").UTF8.GetBytes payload
-		stream.Write bytes 0 bytes.Length
+		-- GetBytes hands back a MAXSCRIPT array, not a .NET array, so it has
+		-- .count and not .Length. Using .Length threw
+		--   Unknown property: "length" in #(123, 34, ...)
+		-- which the old catch-all reported as "connection refused" - the socket
+		-- was fine, the request simply never got written.
+		stream.Write bytes 0 bytes.count
 		stream.Flush()
-		-- Read response (up to 4096 bytes)
-		local buf = dotNetObject "System.Byte[]" 4096
-		local n = stream.Read buf 0 4096
-		resultStr = (dotNetClass "System.Text.Encoding").UTF8.GetString buf 0 n
-		resultOk = (findString resultStr "\"ok\":true") != undefined
+		-- Read until the terminating newline. The old code did a single 4096
+		-- byte Read, which truncated any larger reply (scene_list and the
+		-- handler catalogue are far bigger than 4 KB) and mis-parsed it.
+		-- System.Array.CreateInstance is used rather than
+		-- dotNetObject "System.Byte[]" 4096, which is not a reliable way to
+		-- allocate a .NET array from MaxScript.
+		local buf = (dotNetClass "System.Array").CreateInstance (dotNetClass "System.Byte") 8192
+		local enc = (dotNetClass "System.Text.Encoding").UTF8
+		resultStr = ""
+		local guard = 0
+		while (findString resultStr "\n") == undefined and guard < 512 do
+			(
+			local n = stream.Read buf 0 8192
+			if n <= 0 then exit
+			resultStr += enc.GetString buf 0 n
+			guard += 1
+			)
+		resultOk = (findString resultStr "\"ok\": true") != undefined or \
+		           (findString resultStr "\"ok\":true") != undefined
 		client.Close()
 		)
 	catch
 		(
-		resultStr = "Bridge not running or connection refused on port " + (port as string)
+		-- Report the REAL exception. This previously always said "connection
+		-- refused", which was wrong and unactionable: a raw socket to the same
+		-- port answered fine while this said refused, so the message sent every
+		-- diagnosis down the wrong path.
+		resultStr = "sLibAtlasBridgeCall failed on " + host + ":" + (port as string) + \
+			" -- " + (getCurrentException() as string)
 		resultOk = false
 		)
 	struct _AtlasResult (ok, result)

@@ -226,6 +226,10 @@
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="smartLightingUI`SoulburnScripts" tip="Smart Lighting Ui" label="Smart Lighting Ui" />
         <Item typeID="3" type="CTB_SEPARATOR" width="6" height="16" orientation="31" visible="1" />
         <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="uninstallSoulburn`SoulburnScripts" tip="Uninstall SoulBurn" label="Uninstall SoulBurn" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="vrayMaterialLab`SoulburnScripts" tip="V-Ray Material Lab" label="V-Ray Material Lab" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="vrayMaterialLabUI`SoulburnScripts" tip="V-Ray Material Lab UI" label="V-Ray Material Lab UI" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="vrayMaterialLabAudit`SoulburnScripts" tip="V-Ray Material Audit" label="V-Ray Material Audit" />
+        <Item typeID="2" type="CTB_MACROBUTTON" width="0" height="0" controlID="0" macroTypeID="3" macroType="MB_TYPE_ACTION" actionTableID="647394" imageID="-1" imageName="" actionID="vrayMaterialLabTestRig`SoulburnScripts" tip="V-Ray Material Test Rig" label="V-Ray Material Test Rig" />
             </Items>
         </Window>
     </CUIWindows>

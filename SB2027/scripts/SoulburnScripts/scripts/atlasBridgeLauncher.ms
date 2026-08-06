@@ -52,9 +52,12 @@ global aBLAutoStartIniPath = ((getdir #plugcfg) + "\\SoulburnScripts\\presets\\a
 
 fn aBLPingBridge =
 	(
-	-- Returns true if bridge is reachable on the configured port
-	local result = sLibAtlasBridgeCall "ping" ""
-	return result.ok
+	-- Returns true if the bridge is listening.
+	-- Must NOT send a command: the bridge services requests under
+	-- pymxs.mxstoken(), which needs the MaxScript lock that this very thread is
+	-- holding, so a round-trip from the main thread deadlocks. A bare TCP
+	-- connect needs nothing from the main thread and is a truthful check.
+	return (sLibAtlasBridgePortOpen())
 	)
 
 fn aBLStartBridge =
@@ -84,9 +87,18 @@ fn aBLStartBridge =
 
 fn aBLStopBridge =
 	(
-	-- Send a shutdown command to the bridge
-	local result = sLibAtlasBridgeCall "shutdown" ""
-	return result.ok
+	-- Stop it in-process rather than over the socket. A "shutdown" request would
+	-- have to be serviced under pymxs.mxstoken() by a worker thread while this
+	-- thread holds the MaxScript lock waiting for the reply, which deadlocks.
+	-- Calling stop() directly needs no round-trip.
+	local ok = true
+	try ( python.Execute "import atlas_max_bridge as _b; _b.stop()" )
+	catch
+		(
+		ok = false
+		print ("[atlasBridgeLauncher] stop failed: " + (getCurrentException() as string))
+		)
+	return ok
 	)
 
 fn aBLSetAutoStart enabled =

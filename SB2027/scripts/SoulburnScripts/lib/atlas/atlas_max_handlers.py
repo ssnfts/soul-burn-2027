@@ -1393,6 +1393,132 @@ def cmd_shutdown(params: dict) -> dict:
     return {"shutdown": True}
 
 
+_SB_CACHE: dict | None = None
+
+
+def _soulburn_catalogue() -> dict:
+    """Every SoulBurn tool as an actionable entry an AI can read and invoke.
+
+    Parsed from the installed .mcr (the authoritative macro list) and each
+    script's own header, so the catalogue cannot drift from what is registered.
+    Cached because it involves reading ~200 files.
+    """
+    global _SB_CACHE
+    if _SB_CACHE is not None:
+        return _SB_CACHE
+
+    import os
+    import re
+
+    enu = str(rt.getDir(rt.Name("userScripts")))
+    scripts_dir = os.path.join(enu, "SoulburnScripts", "scripts")
+    macro_dir = os.path.join(os.path.dirname(enu), "usermacros")
+
+    macros: dict[str, dict] = {}
+    if os.path.isdir(macro_dir):
+        for fn in os.listdir(macro_dir):
+            if not fn.lower().endswith(".mcr"):
+                continue
+            try:
+                text = open(os.path.join(macro_dir, fn), encoding="utf-8-sig",
+                            errors="replace").read()
+            except OSError:
+                continue
+            for m in re.finditer(
+                r'MacroScript\s+(\w+)\s+category:"([^"]+)"[^\n]*?tooltip:"([^"]*)"',
+                text, re.I,
+            ):
+                name, cat, tip = m.group(1), m.group(2), m.group(3)
+                if not cat.lower().startswith("soulburn"):
+                    continue
+                macros[name] = {
+                    "name": name,
+                    "category": cat,
+                    "tooltip": tip,
+                    "opens_ui": name.endswith("UI"),
+                }
+
+    # Pull the Description block out of each script header so the entry says
+    # what the tool actually does, not just its name.
+    def describe(base: str) -> str:
+        path = os.path.join(scripts_dir, base + ".ms")
+        if not os.path.isfile(path):
+            return ""
+        try:
+            head = open(path, encoding="utf-8-sig", errors="replace").read(6000)
+        except OSError:
+            return ""
+        m = re.search(r"--\s*Description:\s*\n(.*?)(?:\n-{10,}|\n\s*\n)", head, re.S)
+        if not m:
+            return ""
+        body = [ln.lstrip("- ").strip() for ln in m.group(1).splitlines()]
+        return " ".join(x for x in body if x)[:600]
+
+    desc_cache: dict[str, str] = {}
+    for name, entry in macros.items():
+        base = name[:-2] if name.endswith("UI") else name
+        if base not in desc_cache:
+            desc_cache[base] = describe(base)
+        entry["description"] = desc_cache[base]
+        entry["script"] = base + ".ms"
+
+    _SB_CACHE = {
+        "count": len(macros),
+        "invoke_with": {
+            "command": "soulburn_run",
+            "macro": "<name from tools[].name>",
+            "note": "category defaults to SoulburnScripts; pass category to override",
+        },
+        "tools": sorted(macros.values(), key=lambda d: d["name"].lower()),
+    }
+    return _SB_CACHE
+
+
+def cmd_soulburn_list(params: dict) -> dict:
+    """List every SoulBurn tool with what it does, so an AI can pick one.
+
+    Optional ``filter`` narrows by substring across name/tooltip/description.
+    """
+    cat = _soulburn_catalogue()
+    tools = cat["tools"]
+    needle = str(params.get("filter", "") or "").lower()
+    if needle:
+        tools = [
+            t for t in tools
+            if needle in t["name"].lower()
+            or needle in t.get("tooltip", "").lower()
+            or needle in t.get("description", "").lower()
+        ]
+    return {
+        "count": len(tools),
+        "total": cat["count"],
+        "invoke_with": cat["invoke_with"],
+        "tools": tools,
+    }
+
+
+def cmd_soulburn_run(params: dict) -> dict:
+    """Run a SoulBurn macro by name — the actionable half of soulburn_list."""
+    macro = params.get("macro") or params.get("name")
+    if not macro:
+        raise ValueError("soulburn_run needs 'macro' (see soulburn_list)")
+    category = params.get("category", "SoulburnScripts")
+
+    known = {t["name"] for t in _soulburn_catalogue()["tools"]}
+    if macro not in known:
+        raise ValueError(
+            f"unknown SoulBurn macro {macro!r}; call soulburn_list to enumerate"
+        )
+
+    rt.macros.run(category, rt.Name(macro))
+    return {
+        "ran": macro,
+        "category": category,
+        "object_count": int(rt.objects.count),
+        "note": "UI macros open a floater; action macros operate on the selection",
+    }
+
+
 HANDLERS = {
     "ping": cmd_ping,
     "call": cmd_call,
@@ -1425,6 +1551,8 @@ HANDLERS = {
     "export_scene": cmd_export_scene,
     "import_file": cmd_import_file,
     "shutdown": cmd_shutdown,
+    "soulburn_list": cmd_soulburn_list,
+    "soulburn_run": cmd_soulburn_run,
 }
 
 

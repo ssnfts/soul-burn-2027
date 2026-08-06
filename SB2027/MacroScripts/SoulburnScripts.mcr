@@ -1365,5 +1365,33 @@ MacroScript uninstallSoulburn category:"SoulburnScripts" tooltip:"Uninstall Soul
 	on execute do uninstallSoulburn()
 	)
 
+
+MacroScript vrayMaterialLab category:"SoulburnScripts" tooltip:"vrayMaterialLab" Icon:#("SoulburnScripts_vrayMaterialLab",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/vrayMaterialLab.ms"
+	on execute do vrayMaterialLabDefaults()
+	on Altexecute type do vrayMaterialLabUI()
+	)
+
+MacroScript vrayMaterialLabUI category:"SoulburnScripts" tooltip:"vrayMaterialLabUI" Icon:#("SoulburnScripts_vrayMaterialLabUI",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/vrayMaterialLab.ms"
+	vrayMaterialLabUI()
+	)
+
+MacroScript vrayMaterialLabAudit category:"SoulburnScripts" tooltip:"Audit V-Ray Materials" Icon:#("SoulburnScripts_vrayMaterialLabAudit",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/vrayMaterialLab.ms"
+	on execute do vrayMaterialLabAudit()
+	on Altexecute type do vrayMaterialLabUI()
+	)
+
+MacroScript vrayMaterialLabTestRig category:"SoulburnScripts" tooltip:"Build Material Test Rig" Icon:#("SoulburnScripts_vrayMaterialLabTestRig",1)
+	(
+	Include "$userScripts/SoulburnScripts/scripts/vrayMaterialLab.ms"
+	on execute do vrayMaterialLabTestRig()
+	on Altexecute type do vrayMaterialLabUI()
+	)
+
 )
 -------------------------------------------------------------------------------
