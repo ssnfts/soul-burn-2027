@@ -43,3 +43,7 @@ SB2027/dev/ffmpeg*.log
 SB2027/dev/TOOLBAR_DIAG.txt
 *.typeN.bak
 *.pre-soulburn.bak
+
+# Claude Code scratch (worktrees, session state) - not part of the product
+.claude/
+SB2027/.claude/
