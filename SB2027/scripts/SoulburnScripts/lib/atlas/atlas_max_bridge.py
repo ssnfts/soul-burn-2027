@@ -12,9 +12,9 @@ Architecture — the DCC bridge pattern:
 The 3ds Max API is **main-thread only**. Calling pymxs from a socket handler
 thread corrupts scene state or hard-crashes Max, and the crash lands minutes
 later somewhere unrelated, so it is nearly impossible to attribute. Every job
-enqueued by the socket thread is drained by a MaxScript tickCallback that fires
-on the main thread; ``pymxs.mxstoken()`` is held while each job executes, which
-is the pattern recommended for threaded Python in Max 2025+.
+enqueued by the socket thread is drained by a dotNet System.Windows.Forms.Timer
+whose Tick is raised by the Windows message pump, so the drain always runs on
+the main thread. No Qt/PySide6 dependency.
 
 No PySide6 dependency: Max 2027 ships Python 3.13 whose PySide6 QtCore.pyd
 cannot load against Max's own Qt6Core.dll, producing a DLL load failure.
@@ -136,27 +136,32 @@ class _Bridge:
 
                 payload = json.loads(buf.partition(b"\n")[0].decode("utf-8"))
 
-                job = _Job(payload)
-                self.queue.put(job)
-
-                timeout = float(payload.get("timeout", 120.0))
-                if not job.done.wait(timeout):
+                # Execute here, on this connection thread, guarded by
+                # pymxs.mxstoken() -- Autodesk's documented way to call pymxs
+                # from a non-main thread.
+                #
+                # This used to enqueue the job for a main-thread pump. 3ds Max
+                # has no periodic general callback to drive such a pump
+                # (#tickCallback is not a real callback type), so every job sat
+                # in the queue until the caller timed out and the bridge looked
+                # dead. Running inline under mxstoken is what actually works.
+                try:
+                    handlers = atlas_max_handlers
+                    if DEV_RELOAD:
+                        handlers = importlib.reload(atlas_max_handlers)
+                    token = getattr(pymxs, "mxstoken", None)
+                    if token is not None:
+                        with token():
+                            result = handlers.run_job(payload)
+                    else:
+                        result = handlers.run_job(payload)
+                    response = {"ok": True, "result": result}
+                except Exception as exc:
                     response = {
                         "ok": False,
-                        "error": (
-                            f"timed out after {timeout}s waiting for the 3ds Max "
-                            "main thread. A modal dialog open in Max blocks every "
-                            "command behind it — check for one."
-                        ),
+                        "error": f"{type(exc).__name__}: {exc}",
+                        "traceback": traceback.format_exc(),
                     }
-                elif job.error:
-                    response = {
-                        "ok": False,
-                        "error": job.error,
-                        "traceback": job.traceback,
-                    }
-                else:
-                    response = {"ok": True, "result": job.result}
 
             except Exception as exc:
                 response = {
@@ -194,18 +199,51 @@ class _Bridge:
         self.server = srv
         self.running = True
 
-        # Register a MaxScript tickCallback to drain the job queue on the main
-        # thread at ~30 fps. pymxs.mxstoken() is held while each job runs,
-        # which is the thread-safe pattern for Max 2025+. No PySide6 needed.
-        pymxs.runtime.callbacks.addScript(
-            pymxs.runtime.Name("tickCallback"),
-            (
-                "python.Execute "
-                "'import atlas_max_bridge as _b; _b._BRIDGE._tick()'"
-            ),
-            id=pymxs.runtime.Name("AtlasBridgeTicker"),
+        # Drain the job queue on the MAIN thread at ~30 fps.
+        #
+        # This used callbacks.addScript(#tickCallback, ...), but #tickCallback is
+        # not a real 3ds Max general-callback type -- callbacks.addScript only
+        # accepts scene/system events (#filePostOpen, #selectionSetChanged, ...),
+        # so start() died with:
+        #     callbacks.addScript() unrecognized callback type: #tickCallback
+        # There is no periodic callback in that system at all.
+        #
+        # A dotNet System.Windows.Forms.Timer is the supported way to get a
+        # periodic tick on Max's UI thread: its Tick is raised by the Windows
+        # message pump, so the handler is already on the main thread and pymxs
+        # is safe to call. No Qt, no PySide6.
+        # NOTE: MaxScript's execute() evaluates the string as ONE expression, so
+        # a multi-statement block must be wrapped in parentheses or only the
+        # first statement runs -- which is why the timer silently never existed.
+        # Keep this as a single parenthesised block, unindented.
+        pymxs.runtime.execute(
+            '(\n'
+            'global _atlasBridgeTimer\n'
+            'global _atlasBridgeTick\n'
+            'if _atlasBridgeTimer != undefined do (try (_atlasBridgeTimer.Stop()) catch ())\n'
+            # the handler must stay referenced by a global or .NET collects it
+            'fn _atlasBridgeTick sender args = '
+            '(try (python.Execute "import atlas_max_bridge as _b; _b._BRIDGE._tick()") catch ())\n'
+            '_atlasBridgeTimer = dotNetObject "System.Windows.Forms.Timer"\n'
+            '_atlasBridgeTimer.Interval = 33\n'
+            'dotNet.addEventHandler _atlasBridgeTimer "Tick" _atlasBridgeTick\n'
+            '_atlasBridgeTimer.Start()\n'
+            'true\n'
+            ')'
         )
-        self._ticker_installed = True
+        # The timer is now only a convenience for anything that still enqueues
+        # onto self.queue; jobs from the socket run inline under mxstoken, so a
+        # failed timer must NOT stop the bridge.
+        try:
+            running = pymxs.runtime.execute(
+                '(if _atlasBridgeTimer == undefined then false else _atlasBridgeTimer.Enabled)'
+            )
+        except Exception:
+            running = False
+        self._ticker_installed = bool(running)
+        if not running:
+            print("[atlas] note: main-thread tick timer unavailable; "
+                  "jobs run inline under pymxs.mxstoken()")
 
         self.thread = threading.Thread(target=self._serve, daemon=True)
         self.thread.start()
@@ -217,8 +255,9 @@ class _Bridge:
     def stop(self):
         self.running = False
         if self._ticker_installed:
-            pymxs.runtime.callbacks.removeScripts(
-                id=pymxs.runtime.Name("AtlasBridgeTicker")
+            pymxs.runtime.execute(
+                '(if _atlasBridgeTimer != undefined do '
+                '(try (_atlasBridgeTimer.Stop()) catch (); _atlasBridgeTimer = undefined))'
             )
             self._ticker_installed = False
         if self.server is not None:

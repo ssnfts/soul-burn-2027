@@ -2007,9 +2007,16 @@ fn sLibAtlasBridgeCall cmdName paramsObj =
 		local client = dotNetObject "System.Net.Sockets.TcpClient"
 		client.Connect host port
 		local stream = client.GetStream()
-		-- Build minimal JSON: {"cmd":"<cmdName>","params":{...}}
-		-- paramsObj should be a string already formatted as JSON object body
-		local payload = "{\"cmd\":\"" + cmdName + "\",\"params\":{" + paramsObj + "}}\n"
+		-- Build the JSON the bridge actually expects.
+		-- atlas_max_handlers.run_job reads payload["command"] and passes the
+		-- WHOLE payload to the handler as its params, so the key must be
+		-- "command" (not "cmd") and the parameters must sit at the top level
+		-- (not nested under "params"). Sending {"cmd":...,"params":{...}} made
+		-- every call fail with: unknown command None.
+		local payload = "{\"command\":\"" + cmdName + "\""
+		if paramsObj != undefined and (paramsObj as string) != "" then
+			payload += "," + (paramsObj as string)
+		payload += "}\n"
 		local bytes = (dotNetClass "System.Text.Encoding").UTF8.GetBytes payload
 		stream.Write bytes 0 bytes.Length
 		stream.Flush()

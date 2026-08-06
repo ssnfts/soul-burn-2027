@@ -1,0 +1,9 @@
+module file   : C:\Users\mabdu\AppData\Local\Autodesk\3dsMax\2027 - 64bit\ENU\scripts\SoulburnScripts\lib\atlas\atlas_max_bridge.py
+bridge running: True
+server socket : <socket.socket fd=18792, family=2, type=1, proto=0, laddr=('127.0.0.1', 9879)>
+serve thread  : <Thread(Thread-1 (_serve), started daemon 57324)> alive=True
+host/port     : 127.0.0.1:9879
+connected to 127.0.0.1:9879
+reply: {"ok": false, "error": "ValueError: unknown command None; known: animation_range, assign_material, build_material, call, create_mesh, delete_objects, export_scene, freeze_objects, get_bounds, group_objects, hide_objects, import_file, list_renderers, maxscript, move_to_layer, node_get, node_set, ping, properties, render, save_scene, scene_list, scene_stats, select_objects, set_keys, set_renderer, s
+connected to localhost:9879
+reply: {"ok": false, "error": "ValueError: unknown command None; known: animation_range, assign_material, build_material, call, create_mesh, delete_objects, export_scene, freeze_objects, get_bounds, group_objects, hide_objects, import_file, list_renderers, maxscript, move_to_layer, node_get, node_set, ping, properties, render, save_scene, scene_list, scene_stats, select_objects, set_keys, set_renderer, s
